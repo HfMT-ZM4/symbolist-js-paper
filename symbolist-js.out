@@ -1,0 +1,24 @@
+\BOOKMARK [1][-]{section.1}{ 1. Background}{}% 1
+\BOOKMARK [1][-]{section.2}{ 2. JUCE Version}{}% 2
+\BOOKMARK [1][-]{section.3}{ 3. Clefs and Bidirectional Mapping}{}% 3
+\BOOKMARK [1][-]{section.4}{ 4. Symbolist Electron}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{4.1 Max}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{4.2 Contexts}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.3}{4.3 Mapping}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.4}{4.4 Application Structure}{section.4}% 8
+\BOOKMARK [3][-]{subsubsection.4.4.1}{4.4.1 io and ui elements}{subsection.4.4}% 9
+\BOOKMARK [2][-]{subsection.4.5}{4.5 Symbols}{section.4}% 10
+\BOOKMARK [2][-]{subsection.4.6}{4.6 JSON}{section.4}% 11
+\BOOKMARK [2][-]{subsection.4.7}{4.7 File Format}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.8}{4.8 Graphic Display Format}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.9}{4.9 Symbol}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.10}{4.10 IO Messages}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.11}{4.11 Library Definitions API}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.12}{4.12 Editor}{section.4}% 17
+\BOOKMARK [3][-]{subsubsection.4.12.1}{4.12.1 Interface Components}{subsection.4.12}% 18
+\BOOKMARK [1][-]{section.5}{ 5. Case Study}{}% 19
+\BOOKMARK [1][-]{section.6}{ 6. Floats and equations}{}% 20
+\BOOKMARK [2][-]{subsection.6.1}{6.1 Figures, Tables and Captions}{section.6}% 21
+\BOOKMARK [1][-]{section.7}{ 7. Citations}{}% 22
+\BOOKMARK [1][-]{section.8}{ 8. Conclusions}{}% 23
+\BOOKMARK [1][-]{section.9}{ 9. References}{}% 24
