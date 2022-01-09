@@ -192,18 +192,19 @@ Ircam/ZKM \cite{gottfried2018symbolist}
 
 \section{JUCE Version}\label{sec:juce_version}
 
-explain juce version
+explain juce version (include in overview?)
 MVC
 focused on creating SVG and outputting OSC version (like SVG-OSC approach)
 
 
 \section{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
 
+telling story of how we got where we are, conceptual steps
+
 idea of Clefs
 
 problem:
 a lot of mapping is still needed
-
 
 
 \section{Symbolist Electron}\label{sec:symbolist_electron}
@@ -215,15 +216,18 @@ a lot of mapping is still needed
 \label{fig:screenshot}}
 \end{figure*}
 
-
-a general overview about need for classes, js and \drawsocket makes that easy(-ier)
 using \drawsocket as front end handler
+
+a general overview about need for classes (actually this comes later when we get into the the discussion of format i.e. the way the data is represented.
+
+js and \drawsocket makes that easy(-ier)
+
 
 Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
 
 
 
-\subsection{Max}\label{sec:Max}
+\subsection{Implementations}\label{sec:implementations}
 
 Electron version (node + chrome w/ special electron IPC)
 Max version (node + jweb + Max patch for IPC)
@@ -305,6 +309,8 @@ The main structure of the platform is currently in three parts:
 discuss using DOM elements for hierarchy and document.querySelector in ui
 and similar options in io using score vs model
 
+maybe this should be renamed ..
+the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
 
 
 
@@ -323,8 +329,10 @@ IN SCORE, CONTAINER IS USED TO IDENTIFY PARENT ELEMENT (but it's not a class)
 
 In most cases, a symbol mapping definition will require querying the parent container symbol for information, to plot the data into the container frame's context. 
 
-All symbols are stored in container symbols.
-\subsection{JSON}\label{subsec:json}
+All symbols are stored in container symbols. 
+>> this is true but out of date, any symbol can have "contents" <<
+
+\subsection{Representation}\label{subsec:representation}
 
 Data is stored in JSON format.
 
@@ -352,9 +360,10 @@ For example a simple \textit{symbol} object might look like:
 }
 \end{lstlisting}
 
+
 Here we see an object with the \textit{id} ``foo,'' which is of class type \textit{legs}, that has an attribute \textit{action} associated with it and a start time.
 
-And here is a simple example of a \textit{container} object of a type class \textit{timeline}, which holds two types of leg actions:
+Symbols can also be containers of other symbols, for example an imaginary class \textit{timeline}, which holds two types of leg actions, might look like this:
 
 \begin{lstlisting}[
   mathescape,
@@ -381,7 +390,12 @@ And here is a simple example of a \textit{container} object of a type class \tex
 
 \end{lstlisting}
 
-\subsection{File Format}\label{subsec:file_format}
+\subsection{Score, File Format}\label{subsec:file_format}
+
+Using symbols and symbol containers, we can create tree structures which can be used to represent hierarchical grouping; to represent scores, or other types of data structures.
+
+JSON files
+
 
 Symbolist files are composed in the same way that the data model is stored. The top level symbol will be created in the `top-svg` symbol which is pre-defined in the `index.html` file.
 
@@ -444,7 +458,7 @@ Since `symbolist` is constantly mapping to and from semantic data and its graphi
 
 Typically, the `id` attribute is used to quickly identify graphic objects, for the sake of clarity this is being left out of the examples below.
 
-\subsection{Symbol}\label{subsec:symbol}
+\subsection{SVG Symbol Representation}\label{subsec:symbol}
 
 \begin{minipage}{\linewidth}
 The SVG \symbolist format for a \textit{symbol} is a one top group ($<$g$>$) elements, with two sub-groups:
@@ -614,7 +628,7 @@ Note that the system will pass the same call to both definitions, so if both hav
 MENTION CALL METHOD SYSTEM	
 
 
-discuss BaseClass system
+discuss Template SymbolBaseClass system
 
 
 Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
@@ -736,6 +750,12 @@ Using the template, a basic definition might look like this:
 
 
 \subsection{Editor}\label{subsec:editor}
+
+editor section is maybe not that necessary if we are mainly addressing the backend design?
+maybe could be too much information... not sure
+
+but, the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
+
 
 The graphic user interface of \textit{symbolist} is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
 
