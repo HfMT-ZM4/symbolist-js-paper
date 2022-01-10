@@ -156,7 +156,7 @@ of compositional notation practice.
 how much of a background?
 
 
-In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
+In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\cite{world2000scalable}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
 
 Initially developed as a method for performing vector graphics, 
 SVG-OSC  \cite{gottfried2015svg}
@@ -306,7 +306,7 @@ The main attributes used for \symbolist semantic data objects are:
 \item \textit{contents}: an array of child objects that a parent container object might hold (required for container symbols).
 \end{itemize}
 
-In addition to the required \textit{id} and \textit{class} attributes, symbol objects may include any number of other \textit{attributes}~\footnote{The term \textit{attribute} is used here interchangeably with properties, parameters, aspects, etc.} of the symbol (\textit{pitch}, \textit{amplitude}, etc.). For example a simple semantic object written in JSON might look like:
+In addition to the required \textit{id} and \textit{class} attributes, symbol objects may include any number of other \textit{attributes}\footnote{The term \textit{attribute} is used here interchangeably with properties, parameters, aspects, etc.} of the symbol (\textit{pitch}, \textit{amplitude}, etc.). For example a simple semantic object written in JSON might look like:
 
 \begin{lstlisting}[
   mathescape,
@@ -418,69 +418,30 @@ The current default initialization config file looks like this:
 
 The initialization file is literally a score object file, providing the default context for a given authoring situation. In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbol (which are all actually containers as well, initialized as empty arrays). The \textit{palette} and \textit{tools} attributes tell the application to provide access to certain tools, and child symbols in the GUI (see also section~\ref{editor}).
 
-\section{Graphic Display Format}\label{subsec:file_format}
+\section{Graphic Display Format}\label{graphic_display_format}
 
-The graphic representation of symbols is in SVG format, which is laid out in the `index.html` file. The \drawsocket SVG/HTML/CSS wrapper is being used for convenience, to provide a shorthand method of creating and manipulating browser window elements. However, since the \textit{ui\_controller} and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
+The graphic representation of the data in \symbolist uses SVG format, and and follows the same hierarchical structure of the data as found in the semantic data score object.
+Since the new version of \symbolist uses a browser as a frontend, we are able to take advantage of the many standard tools and web functionalities provided by browsers for display, interaction and data management.
 
-Since \symbolist is constantly mapping to and from semantic data and its graphic representation, we are using the HTML \textit{dataset} feature to store the semantic data inside the SVG object.
+Like the JSON score initialization file above, the main application window is setup using HTML/CSS, and utilizing \drawsocket as a convenience wrapper to provide shorthand methods to create and manipulating browser window elements. 
 
-Typically, the `id` attribute is used to quickly identify graphic objects, for the sake of clarity this is being left out of the examples below.
+\subsection{SVG}
 
-\subsection{SVG Symbol Representation}\label{subsec:symbol}
+The \symbolist format for an SVG \textit{symbol} is a one top group ($<$g$>$) elements, with two sub-groups for \textit{display} and \textit{contents}, using HTML/CSS class names. The most simple SVG symbol would be:
 
-\begin{minipage}{\linewidth}
-The SVG \symbolist format for a \textit{symbol} is a one top group ($<$g$>$) elements, with two sub-groups:
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-    breaklines=true,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-<g  class="symbolClassName symbol" data-time="0.1" data-duration="1">
-    <g class='symbolClassName display'></g>
-    <g class='symbolClassName contents'></g>
-</g>
-\end{lstlisting}
-\end{minipage}
-
-
-
-Each symbol grouping element is tagged using CSS class names, following the symbol's unique class name (in this example ``symbolClassName''):
-\begin{itemize}\itemsep0pt 
-\item \textit{symbol} marks the top-level grouping object of the symbol
-\begin{itemize}\itemsep0pt 
-  \item \textit{display} a group that holds the visual display of the container symbol, and
-  \item \textit{contents} which contains other symbols.
-  \end{itemize}
-\end{itemize}
-
-
-
-Note that the order is important: \textit{the symbol class type must be first}.
-
-The semantic data is also stored in the top-level symbol $<$g$>$ element, using the HTML dataset feature, marked with the prefix `data-`.
-
-For example:
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-    breaklines=true,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-<g  class='containerClassName symbol container' data-time='0.1' data-duration='1'>
-    <g class='containerClassName display'>
-         <line .... />
-    </g>
-    <g class='containerClassName contents'>
-        <g class"symbolClassName symbol" data-time="0.1" data-duration="1">
-            <circle .... />
-        </g>
-    </g>
+\begin{lstlisting}[mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
+<g  id="foo" class="SymbolClassName symbol">
+    <g class='SymbolClassName display'></g>
+    <g class='SymbolClassName contents'></g>
 </g>
 \end{lstlisting}
 
+
+Just like the semantic data objects, graphics objects have required \textit{id} and \textit{class} parameters, with an optional \textit{contents} element.
+
+Each symbol grouping element is tagged using class names, following the symbol's unique class name (in this example ``SymbolClassName''). Note that the order is important: \textit{the symbol class type must be first}. The \textit{symbol} tag marks the top-level grouping object of the symbol, the \textit{display} element is a group that holds all of this symbol's visual display information, and the \textit{contents} is an group object for holding any potential child elements. Note that for simplicity, all \symbolist graphic elements include the \textit{contents} element as a placeholder.
+
+\subsection{HTML}
 
 Symbols and containers could also potentially be HTML elements instead of SVG. In the case of HTML you would use $<$div$>$ tags instead of SVG $<$g$>$:
 html:
@@ -490,13 +451,37 @@ html:
   columns=fullflexible,
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
 ]
-<div class='containerClassName symbol container'>
-    <div class='containerClassName display'></div>
-    <div class='containerClassName contents'></div>
+<div class='SymbolClassName symbol'>
+    <div class='SymbolClassName display'></div>
+    <div class='SymbolClassName contents'></div>
 </div>
 \end{lstlisting}
 
 
+\subsection{dataset-elements}
+
+Since \symbolist is constantly mapping to and from semantic data and its graphic representation, we are using the HTML \textit{dataset} feature\footnote{https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset} to store the semantic data inside the top-level \textit{symbol} element ($<$g$>$ or $<$div$>$).
+The HTML dataset attributes use the prefix ``\textit{data-}''.\footnote{Note that according to the HTML dataset specifications, all names will be converted to lowercase, this can create issues in some cases, so best practice is to use all lowercase for attribute names.}
+
+For example, mapping our imaginary ``legs'' actions above, the corresponding SVG objects would be (skipping the actual display drawing for now):
+
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
+<g  id="bar" class="timeline symbol" data-duration="1">
+  <g class='Timeline display'></g>
+  <g class='Timeline contents'>
+      <g  id="foo-1" class="Legs symbol" data-action="jump" data-starttime="0.1">
+        <g class='Legs display'></g>
+        <g class='Legs contents'></g>
+      </g>
+      <g  id="foo-2" class="Legs symbol" data-action="sit" data-starttime="0.2">
+        <g class='Legs display'></g>
+        <g class='Legs contents'></g>
+      </g>
+    </g>
+</g>
+\end{lstlisting}
+\end{minipage}
 
 
 \begin{figure*}[ht!]
@@ -633,6 +618,8 @@ Note that the system will pass the same call to both definitions, so if both hav
 
 MENTION CALL METHOD SYSTEM	
 
+%moved from above:
+However, since the \textit{ui\_controller} and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
 
 discuss Template SymbolBaseClass system
 
