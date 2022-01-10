@@ -21,6 +21,13 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{world2000scalable}
+\BIBentryALTinterwordspacing
+{World Wide Web Consortium}, ``{Scalable Vector Graphics (SVG) 1.1 (Second
+  Edition)},'' \emph{W3C Candidate Recommendation}, 2011. [Online]. Available:
+  \url{https://www.w3.org/TR/SVG11/}
+\BIBentrySTDinterwordspacing
+
 \bibitem{wright:osc}
 M.~Wright, ``{Open Sound Control: an enabling technology for musical
   networking},'' \emph{Organised Sound}, vol.~10, no.~3, pp. 193--200, 2005.
@@ -64,6 +71,9 @@ R.~Gottfried and G.~Hajdu, ``Drawsocket: A browser based system for networked
 G.~Hajdu, ``Quintet. net: An environment for composing and performing music on
   the internet,'' \emph{Leonardo}, vol.~38, no.~1, pp. 23--30, 2005.
 
+\bibitem{crockford2012json}
+D.~Crockford, ``Json,'' \emph{ECMA International}, 2012.
+
 \bibitem{guest2014labanotation}
 A.~H. Guest, \emph{Labanotation: The System of Analyzing and Recording
   Movement}.\hskip 1em plus 0.5em minus 0.4em\relax Routledge, 2005.
@@ -101,8 +111,5 @@ T.~Baca, J.~W. Oberholtzer, J.~Trevi{\~n}o, and V.~Ad{\'a}n, ``Abjad: An
 G.~Burloiu, A.~Cont, and C.~Poncelet, ``A visual framework for dynamic mixed
   music notation,'' \emph{Journal of New Music Research}, vol.~46, no.~1, pp.
   54--73, 2017.
-
-\bibitem{crockford2012json}
-D.~Crockford, ``Json,'' \emph{ECMA International}, 2012.
 
 \end{thebibliography}

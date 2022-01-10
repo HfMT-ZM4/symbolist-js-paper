@@ -226,7 +226,7 @@ Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
 
 \section{Implementations}\label{sec:implementations}
 
-Electron version (node + chrome w/ special electron IPC)
+Electron\footnote{https://www.electronjs.org/} version (node + chrome w/ special electron IPC)
 Max version (node + jweb + Max patch for IPC)
 
 
@@ -240,14 +240,19 @@ Max version (node + jweb + Max patch for IPC)
 
 \subsection{Application Structure}\label{subsec:application_structure}
 
-The main structure of the platform is currently in three parts:
+The main architecture of the platform (figure~\ref{fig:architecture}) is organized as a server-client model, comprising of:
 
-\begin{enumerate}\itemsep0pt
-\item The \textit{editor}, a browser-based graphic user interface which displays the graphic representation of the data, and allows the user to edit and create new data from graphic interaction. The editor loads a library of scripts that define mappings to and from data and graphics formats. The editor receives and outputs data in the semantic format, keeping the concerns of drawing within the browser-side.
+\begin{enumerate}\itemsep0pt 
+\item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \textit{ui\_controller} runs in the browser handling interaction, via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
 
-\item The \textit{server}, a node.js (or electron) based webserver which routes messages between the \textit{editor} and the \textit{io} system, and handles operating system commands like reading and writing files.
+\item The \textit{symbolist server}, which is comprised of: 
+\begin{itemize}\itemsep0pt 
 
-\item  The \textit{io-server}, which handles input and output from external sources via OSC. The \textit{io-server} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{editor} which define the mapping to (and potentially from) other media sources. The \textit{io-server} might also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
+\item A node.js (Electron) based web-server which serves the main editor webpage via HTTP, and routes messages between the \textit{ui\_controller} and the \textit{io\_controller} via WebSockets, and handles operating system commands like reading and writing files.
+
+\item  The \textit{io\_controller} script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket. The \textit{io\_controller} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{ui\_controller} which define the mapping to (and potentially from) other media sources. The \textit{io\_controller} can also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
+\end{itemize}
+
 \end{enumerate}
 
 
@@ -266,7 +271,7 @@ In order to maintain an open and un-opinionated approach to authoring tools, \sy
 %main interesting thing to talk about is the palette system
 
 The \symbolist graphic editor (shown in figure~\ref{fig:screenshot}) provides a set of basic tools for creating scores using the defined symbols and containers:
-\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
+\begin{itemize}\itemsep0pt 
 \item \textit{document view}: the top level view of the application window.
 \item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
 \item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
@@ -534,7 +539,10 @@ Between each of these representation contexts there is a layer of mapping, with 
 
 \textit{Graphic representation to semantic data} mapping (figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
 
-\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).~\footnote{Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.}
+\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).
+
+Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.
+Note also that the \textit{ui\_controller} receives and outputs messages always in in the \textit{semantic data} format, keeping the concerns of drawing within the browser-side. That said, it is also possible to send \drawsocket messages directly to the UI via the OSC-UDP communication port.
 
 % mapping figures
 
@@ -561,7 +569,20 @@ Between each of these representation contexts there is a layer of mapping, with 
 
 
 
-\subsection{io and ui elements}\label{subsec:io_ui_elements}
+\section{Symbol Definitions}\label{library_definitions_api}
+
+Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
+
+Eventually it is planned to provide a set of tools in the GUI for defining a mapping definition graphically but this is not yet implemented.
+
+There are two types of definition scripts:
+* `ui` definitions perform user interactions and mapping between semantic data representation and graphic representation.
+* `io` definitions are used to assist in the lookup/playback and mapping of the semantic data to media like sound synthesis, video, etc.
+
+Currently, the system uses the same `.js` file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
+
+
+\subsubsection*{io and ui elements}\label{subsec:io_ui_elements}
 
 discuss using DOM elements for hierarchy and js document.querySelector in ui
 and similar options in io using score vs model
@@ -574,25 +595,41 @@ The data objects is stored in a \textit{model} or \textit{score} which is made u
 maybe this should be renamed ..
 the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
 
-\section{Symbol Library Definitions API}\label{library_definitions_api}
-
-MENTION CALL METHOD SYSTEM	
-
-%moved from above:
 However, since the \textit{ui\_controller} and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
 
-discuss Template SymbolBaseClass system
+\subsection{Creating Symbols via OSC}
+
+a mechanism for mapping semantic data received from an external application via OSC to symbolic graphic representation; for example by generating scores through algorithmic processes, via textual authoring, via mapping from gestural controller, etc.
+
+using \drawsocket \textit{key/val} message syntax:
+
+\textit{data}: adds a data object to the score, and sends to the ui to be mapped to graphical representation. Parameters include:
+\begin{itemize}\itemsep0pt 
+  \item \textit{class} (required) the class type of the object to create
+  \item \textit{container} (required) the container symbol class to put the object in (in case there are multiple containers that support the same symbol type)
+  \item \textit{id} (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
+  \item Other required or optional parameters will depend on the symbol definition.
+\end{itemize}
+
+\begin{lstlisting}[ mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
+{
+    /key : "data",
+    /val : {
+        /class : "fiveLineStaveEvent",
+        /id : "foo"
+        /container : "oboe",
+        /time : 0.13622,
+        /ratio : "7/4",
+        /duration : 0.1,
+        /amp : 1
+    }
+  }
+\end{lstlisting}
 
 
-Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
 
-Eventually it is planned to provide a set of tools in the GUI for defining a mapping definition graphically but this is not yet implemented.
+\subsection{API Template SymbolBaseClass }\label{sec:template}
 
-There are two types of definition scripts:
-* `ui` definitions perform user interactions and mapping between semantic data representation and graphic representation.
-* `io` definitions are used to assist in the lookup/playback and mapping of the semantic data to media like sound synthesis, video, etc.
-
-Currently, the system uses the same `.js` file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
 Using the template, a basic definition might look like this:
 
