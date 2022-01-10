@@ -491,52 +491,29 @@ For example, mapping our imaginary ``legs'' actions above, the corresponding SVG
 \label{fig:architecture}}
 \end{figure*}
 
-%The top level symbol will be created in the `top-svg` symbol which is pre-defined in the `index.html` file.
 
+\section{Graphical Authoring and Interaction}\label{editor} %should this be before or after the application structure?
 
-%this should maybe all be moved up above the API and IO messages?
-\section{UX: Graphical Authoring and Interaction}\label{editor}
+%the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
 
-editor section is maybe not that necessary if we are mainly addressing the backend design?
-maybe could be too much information... not sure
-
-but, the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
-
-
-The graphic user interface of \textit{symbolist} is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
+The graphic user interface of \symbolist is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
 
 In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. Rather, the interaction and meanings of the symbols are defined in a library of object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. Definitions can be shared and loaded to setup different composition environments.
 
-See below for more information about the API for creating symbol definitions. 
+%See below for more information about the API for creating symbol definitions. 
 
-\subsubsection{Interface Components}\label{subsec:interface_components}
+\subsection{Interface Components}\label{subsec:interface_components}
 
 %main interesting thing to talk about is the palette system
 
-The \symbolist graphic editor provides a set of basic tools for creating scores using the defined symbols and containers:
+The \symbolist graphic editor (shown in figure~\ref{fig:screenshot}) provides a set of basic tools for creating scores using the defined symbols and containers:
 \begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
 \item \textit{document view}: the top level view of the application window.
 \item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
-\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the `symbols` that have been defined for the current selected \textit{container}. 
-\item \textit{tools}: (not yet implemented in the current version) a set of interactive tools that provide ways of creating new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
+\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
+\item \textit{tools}: a set of buttons that open tools for custom computer-assisted generation of new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
 \item \textit{inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
 \end{itemize}
-
-On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
-
-A typical sequence of creating a score might be as follows:
-\begin{enumerate}\itemsep0pt
-\item the user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
-\item selecting the "paper" container rectangle, the user then sets the container as the new `context`, by pressing the `[s]` key (or selecting from the application menu).
-\item once setting the context, the `palette` toolbar is populated with icons of symbols that are defined with the selected container context type.
-\item clicking on one of the symbol icons, puts the interface into "creation" or "palette mode", where the mouse interaction is now designed for use with this specific symbol type.
-\item holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
-\item after clicking the symbol is placed in the container.
-\item depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
-\item selecting the symbol and hitting the `[i]` button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
-\item selecting and pressing the `[e]` button enters "edit mode" which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
-\end{enumerate}
-
 
 \subsection{Modes}
 maybe this should just be a list
@@ -545,6 +522,23 @@ maybe this should just be a list
 \subsubsection{Inspector}
 \subsubsection{Edit}
 
+
+\subsection{User Experience}\label{ux}
+
+On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
+
+A typical sequence of creating a score might be as follows:
+\begin{enumerate}\itemsep0pt
+\item The user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
+\item Selecting the ``paper'' container rectangle, the user then sets the container as the new \textit{context}, by pressing the [s] key (or selecting from the application menu).
+\item Once setting the context, the \textit{palette} toolbar is populated with icons of symbols that are defined with the selected container context type.
+\item Clicking on one of the symbol icons, puts the interface into \textit{creation} / \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
+\item Holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
+\item After clicking the symbol is placed in the container.
+\item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
+\item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
+\item Selecting and pressing the [e] button enters \textit{edit mode} which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
+\end{enumerate}
 
 
 \section{Application Structure}\label{subsec:application_structure}
@@ -563,7 +557,7 @@ The main structure of the platform is currently in three parts:
 
 \subsubsection{io and ui elements}\label{subsec:io_ui_elements}
 
-discuss using DOM elements for hierarchy and document.querySelector in ui
+discuss using DOM elements for hierarchy and js document.querySelector in ui
 and similar options in io using score vs model
 
 
@@ -732,21 +726,17 @@ The OSC message API supports the following keys:
   \item Other required or optional parameters will depend on the symbol definition.
 \end{itemize}
 
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
+\begin{lstlisting}[ mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
 {
     /key : "data",
     /val : {
         /class : "fiveLineStaveEvent",
         /id : "foo"
         /container : "oboe",
-	    /time : 0.13622,
-	    /ratio : "7/4",
-	    /duration : 0.1,
-	    /amp : 1
+        /time : 0.13622,
+        /ratio : "7/4",
+        /duration : 0.1,
+        /amp : 1
     }
   }
 \end{lstlisting}
