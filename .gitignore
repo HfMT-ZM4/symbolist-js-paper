@@ -1,6 +1,7 @@
 .DS_Store
 *.aux
 *.blg
+*.bbl
 *.log
 *.out
 *.pdf

@@ -27,7 +27,7 @@
 
 
 % REDEFINE THESE VARIABLES:
-\def\papertitle{Symbolist: redesigned for dynamic bidirectional mapping}
+\def\papertitle{Symbolist: bidirectional mapping developements}
 \def\firstauthor{Rama Gottfried}
 \def\secondauthor{James Tsz-Him Cheung}
 \def\thirdauthor{Georg Hajdu}
@@ -182,14 +182,15 @@ however it can require a lot of specialized code to handle different hierarchy s
 the first version of \symbolist was created as a standalone JUCE application
 Ircam/ZKM~\cite{gottfried2018symbolist}
 
-\section{JUCE Version}\label{sec:juce_version}
+% this can probably be in the backstory part
+\subsection{JUCE Version}\label{sec:juce_version}
 
 explain juce version (include in overview?)
 MVC~\cite{krasner1988description}
 focused on creating SVG and outputting OSC version (like SVG-OSC approach)
 
 
-\section{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
+\subsection{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
 
 telling story of how we got where we are, conceptual steps
 
@@ -198,14 +199,8 @@ idea of Clefs
 problem:
 a lot of mapping is still needed
 
+\subsection{Drawsocket}\label{sec:drawsocket}
 
-
-\begin{figure*}[ht!]
-\centering
-\includegraphics[width=2\columnwidth]{symbolist.png}
-\caption{ \symbolist screenshot, showing some different types of staves, and editing capabilities.
-\label{fig:screenshot}}
-\end{figure*}
 
 \section{Symbolist Electron}\label{sec:symbolist_electron}
 
@@ -221,58 +216,77 @@ js and \drawsocket makes that easy(-ier)
 Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
 
 
+% screenshot
+\begin{figure*}[ht!]
+\centering
+\includegraphics[width=2\columnwidth]{symbolist.png}
+\caption{ \symbolist screenshot, showing some different types of staves, and editing capabilities.
+\label{fig:screenshot}}
+\end{figure*}
+
 
 \subsection{Implementations}\label{sec:implementations}
 
 Electron version (node + chrome w/ special electron IPC)
 Max version (node + jweb + Max patch for IPC)
 
-\subsection{Contexts}\label{subsec:contexts}
+\section{Data Representation}\label{subsec:representation}
 
-There are three basic representation contexts at the core of \symbolist:
+At the heart of \symbolist are two parallel forms of information expression: \textit{semantic data} and \textit{graphic representation} (figure~\ref{fig:graphic-representation}).
 
-\begin{enumerate}\itemsep0pt
-\item \textbf{semantic data}, which specifies the various attributes of information about a symbolic object, in terms of the \textit{meaning} to the author. The  \textit{semantic data} is the main holder of information in the system, which arranged as a score can function like a database of hierarchal information. For example, a note might contain information about pitch and duration, or a point in space might contain x, y, and z values.
-\item \textbf{graphic representation}, the visual representation of the semantic data (see figure~\ref{fig:graphic-representation}).
-\item \textbf{performance media}, the performance mechanism which can be used to control different media types using the score data as parameter values. 
-\end{enumerate}
+\textit{Semantic data} specifies the various attributes of information about a symbolic object, in terms of the object's meaning to the author. 
+For example, the meaningful attributes of a \textit{note} object might be information about pitch and duration, or a \textit{point} object might contain x, y, and z values corresponding to the point's location in 3D space. In \symbolist \textit{semantic data} is thought of as the main holder of information in the system, which arranged as a score can function like a database of hierarchal information (further explained in section \ref{subsec:file_format} below).
 
+The \textit{graphic representation} of the information is a visual representation of the semantic data, which is open in nature. The aim of \symbolist is to provide an agnostic framework for developing visual, symbolic, or other unknown representations of semantic data for use in multimedia composition practice; and so, one of the main functions of the new version of the software is to facilitate the creation of mapping relationships between different representations of the data (see figure~\ref{fig:graphic-representation}).
 
 
 \begin{figure}[ht!]
-\includegraphics[width=1\columnwidth]{graphic-representation.pdf}
+\centering
+\includegraphics[width=0.8\columnwidth]{graphic-representation.pdf}
 \caption{\textit{data} vs \textit{graphic} representation of the same information.
 \label{fig:graphic-representation}}
 \end{figure}
 
 
+\subsection{Performing Data}
+
+Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
+
+\symbolist provides several different options for sorting and looking up data (see figure~\ref{fig:score-lookup}), which can serve as a structure for the performance of a ``score'', or other data formats. Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author (see section \ref{subsec:io_messages} for further discussion of performing data). 
+
+In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
 
 \subsection{Mapping}\label{subsec:mapping}
 
-Between each of these representation contexts there is a layer of mapping:
+Between each of these representation contexts there is a layer of mapping, with the \textit{semantic data} serving as the primary representation type. 
 
-\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
-\item \textit{semantic data} to \textit{graphic representation} is used for the creation of graphic symbols based on input of semantic data.
-\item \textit{graphic representation} to \textit{semantic data} is used to edit, or create new data entries, based on graphic information.
-\item \textit{semantic data} to \textit{performance media} is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).
-\item mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data.
-\end{itemize}
+\textit{Semantic data to graphic representation} mapping (figure~\ref{fig:data-to-graphic}) is used for the creation of graphic symbols from a stream of input, for example from generative processes, textural authoring, or computer assisted composition systems~\cite{bresson2011om, didkovsky2008maxscore, agostini2015max, baca2015abjad, burloiu2017visual}.
+
+\textit{Graphic representation to semantic data} mapping (figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
+
+\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time). 
+
+In \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data.
 
 % mapping figures
+
 \begin{figure}[ht!]
-\includegraphics[width=1\columnwidth]{data-to-graphic.pdf}
+\centering
+\includegraphics[width=0.8\columnwidth]{data-to-graphic.pdf}
 \caption{\textit{semantic data} mapped to create a \textit{graphic} representation from input data.
 \label{fig:data-to-graphic}}
 \end{figure}
 
 \begin{figure}[ht!]
-\includegraphics[width=1\columnwidth]{graphic-to-data.pdf}
+\centering
+\includegraphics[width=0.8\columnwidth]{graphic-to-data.pdf}
 \caption{If edited graphically, the updated graphic data is then mapped back to \textit{semantic data} representation. 
 \label{fig:graphic-to-data}}
 \end{figure}
 
 \begin{figure}[ht!]
-\includegraphics[width=1\columnwidth]{score-lookup.pdf}
+\centering
+\includegraphics[width=0.8\columnwidth]{score-lookup.pdf}
 \caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
 \label{fig:score-lookup}}
 \end{figure}
@@ -327,7 +341,7 @@ In most cases, a symbol mapping definition will require querying the parent cont
 All symbols are stored in container symbols. 
 >> this is true but out of date, any symbol can have "contents" <<
 
-\subsection{Representation}\label{subsec:representation}
+\subsection{Data Format}\label{subsec:format}
 
 Data is stored in JSON format.
 
@@ -385,7 +399,7 @@ Symbols can also be containers of other symbols, for example an imaginary class 
 
 \end{lstlisting}
 
-\subsection{Score, File Format}\label{subsec:file_format}
+\subsection{Score, File Format}\label{}
 
 Using symbols and symbol containers, we can create tree structures which can be used to represent hierarchical grouping; to represent scores, or other types of data structures.
 
@@ -760,6 +774,8 @@ See below for more information about the API for creating symbol definitions.
 
 \subsubsection{Interface Components}\label{subsec:interface_components}
 
+%main interesting thing to talk about is the palette system
+
 The \symbolist graphic editor provides a set of basic tools for creating scores using the defined symbols and containers:
 \begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
 \item \textit{document view}: the top level view of the application window.
@@ -788,7 +804,7 @@ A typical sequence of creating a score might be as follows:
 
 
 
-\section{Case Study}\label{sec:node_score}
+\section{Case Study}\label{sec:james_score}
 \input{james_score}
 
 
