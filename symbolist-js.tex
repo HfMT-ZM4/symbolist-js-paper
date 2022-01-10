@@ -38,6 +38,8 @@
 \usepackage{xspace}
 \def\symbolist{\textsc{symbolist}\xspace}
 \def\drawsocket{\textsc{drawsocket}\xspace}
+\def\uicontroller{\textit{ui\_controller}\xspace}
+\def\iocontroller{\textit{io\_controller}\xspace}
 \makeatletter
 \newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
 \makeatother
@@ -243,14 +245,14 @@ Max version (node + jweb + Max patch for IPC)
 The main architecture of the platform (figure~\ref{fig:architecture}) is organized as a server-client model, comprising of:
 
 \begin{enumerate}\itemsep0pt 
-\item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \textit{ui\_controller} runs in the browser handling interaction, via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
+\item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \uicontroller runs in the browser handling interaction, via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
 
 \item The \textit{symbolist server}, which is comprised of: 
 \begin{itemize}\itemsep0pt 
 
-\item A node.js (Electron) based web-server which serves the main editor webpage via HTTP, and routes messages between the \textit{ui\_controller} and the \textit{io\_controller} via WebSockets, and handles operating system commands like reading and writing files.
+\item A node.js (Electron) based web-server which serves the main editor webpage via HTTP, and routes messages between the \uicontroller and the \iocontroller via WebSockets, and handles operating system commands like reading and writing files.
 
-\item  The \textit{io\_controller} script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket. The \textit{io\_controller} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{ui\_controller} which define the mapping to (and potentially from) other media sources. The \textit{io\_controller} can also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
+\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket. The \iocontroller holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \uicontroller which define the mapping to (and potentially from) other media sources. The \iocontroller can also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
 \end{itemize}
 
 \end{enumerate}
@@ -542,7 +544,7 @@ Between each of these representation contexts there is a layer of mapping, with 
 \textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).
 
 Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.
-Note also that the \textit{ui\_controller} receives and outputs messages always in in the \textit{semantic data} format, keeping the concerns of drawing within the browser-side. That said, it is also possible to send \drawsocket messages directly to the UI via the OSC-UDP communication port.
+Note also that the \uicontroller receives and outputs messages always in in the \textit{semantic data} format, keeping the concerns of drawing within the browser-side. That said, it is also possible to send \drawsocket messages directly to the UI via the OSC-UDP communication port.
 
 % mapping figures
 
@@ -576,10 +578,11 @@ Definition scripts are composed as Javascript modules which are loaded into the 
 Eventually it is planned to provide a set of tools in the GUI for defining a mapping definition graphically but this is not yet implemented.
 
 There are two types of definition scripts:
-* `ui` definitions perform user interactions and mapping between semantic data representation and graphic representation.
-* `io` definitions are used to assist in the lookup/playback and mapping of the semantic data to media like sound synthesis, video, etc.
-
-Currently, the system uses the same `.js` file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
+\begin{itemize}\itemsep0pt 
+\item \textit{ui definitions} perform user interactions and mapping between semantic data representation and graphic representation.
+\item \textit{io definitions} are used to assist in the lookup/playback and mapping of the semantic data to media like sound synthesis, video, etc.
+\end{itemize}
+%Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
 
 \subsubsection*{io and ui elements}\label{subsec:io_ui_elements}
@@ -595,9 +598,13 @@ The data objects is stored in a \textit{model} or \textit{score} which is made u
 maybe this should be renamed ..
 the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
 
-However, since the \textit{ui\_controller} and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
+However, since the \uicontroller and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
 
 \subsection{Creating Symbols via OSC}
+
+The simplest example of mapping definition is the \textit{semantic to graphic} mapping definition.
+
+the \iocontroller has 
 
 a mechanism for mapping semantic data received from an external application via OSC to symbolic graphic representation; for example by generating scores through algorithmic processes, via textual authoring, via mapping from gestural controller, etc.
 
@@ -831,7 +838,14 @@ Note that the system will pass the same call to both definitions, so if both hav
 \input{james_score}
 
 
-\section{Conclusions}
+\section{Conclusions and Future Developments}
+
+continue work on CP notation
+GUI for definitions
+C/C++ score player, optimized for fast lookup - write to buffer?
+further experiments in representation, spatial audio, eurorack modules, 
+connect with antescofo?
+connect with faust? create audio code via faust, or maybe pd?
 
 
 \begin{acknowledgments}
