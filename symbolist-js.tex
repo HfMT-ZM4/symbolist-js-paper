@@ -246,7 +246,6 @@ The \textit{graphic representation} of the information is a visual representatio
 \label{fig:graphic-representation}}
 \end{figure}
 
-
 \subsection{Performing Data}
 
 Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
@@ -263,9 +262,7 @@ Between each of these representation contexts there is a layer of mapping, with 
 
 \textit{Graphic representation to semantic data} mapping (figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
 
-\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time). 
-
-Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data.
+\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).~\footnote{Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.}
 
 % mapping figures
 
@@ -297,7 +294,7 @@ Note that in \symbolist mapping between \textit{performance media} and \textit{g
 In \symbolist terminology a \textit{symbol} is an instance of a symbolic representation of data that connects the semantic, graphic, and possibly other media types of expression together as a multifaceted unit.
 Each \textit{symbol} is defined as a \textit{class} of object, which specifies the symbol's data structure and UI interaction, and data mapping to different representational contexts.
 
-\subsection{Data Format}\label{subsec:format}
+\subsection{Semantic Data Format}\label{subsec:format}
 
 Within the \symbolist application, semantic data is stored as javascript objects, and read/written in JSON format~\cite{crockford2012json}, which is transcoded to and from OSC for inter-application communication.
 
@@ -362,20 +359,14 @@ When a symbol contains other symbols, the child symbols are stored as an array i
 % move this to the definitions discussion?
 In most cases, a symbol's mapping definition will require querying its parent symbol for information, to plot its data relative to the container context, for example offsetting the screen coordinate position based on the parent object position.
 
-% there are two top level symbols: top-svg and top-html, not sure if we need to say that here or not... probably not
-
-\subsection{Score, File Format}\label{}
-
-The \textit{semantic data} is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
+\subsection{Score, File Format}\label{json_files}
 
 Using symbols and symbol containers, we can create tree structures which can be used to represent hierarchical grouping; to represent scores, or other types of data structures.
+At the root of the tree structure is a top-level symbol, which might (but not necessarily) define behavior of its children objects.
+Since the data elements are stored in js objects, it is easy to import/export \symbolist scores as JSON files.
 
-JSON files
-
-
-Symbolist files are composed in the same way that the data model is stored. The top level symbol will be created in the `top-svg` symbol which is pre-defined in the `index.html` file.
-
-An example initialization config file might look like this:
+When the application loads, it reads a default initialization file, in the form of a \symbolist score.
+The current default initialization config file looks like this:
 
 \begin{lstlisting}[
   mathescape,
@@ -386,9 +377,9 @@ An example initialization config file might look like this:
 {
     "about" : "symbolist will read a json file to configure the palette setup, this can be used to dynamically change the application layout and tools",
     "id" : "Score",
+    "class" : "RootSymbol",
     "tools" : [],
     "palette" : ["SubdivisionTool", "BasicSymbolGL"],
-    "class" : "RootSymbol",
     "contents": { 
         "id" : "trio",
         "class" : "SystemContainer",
@@ -425,12 +416,13 @@ An example initialization config file might look like this:
 }
 \end{lstlisting}
 
+The initialization file is literally a score object file, providing the default context for a given authoring situation. In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbol (which are all actually containers as well, initialized as empty arrays). The \textit{palette} and \textit{tools} attributes tell the application to provide access to certain tools, and child symbols in the GUI (see also section~\ref{editor}).
 
-\subsection{Graphic Display Format}\label{subsec:file_format}
+\section{Graphic Display Format}\label{subsec:file_format}
 
 The graphic representation of symbols is in SVG format, which is laid out in the `index.html` file. The \drawsocket SVG/HTML/CSS wrapper is being used for convenience, to provide a shorthand method of creating and manipulating browser window elements. However, since the \textit{ui\_controller} and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
 
-Since `symbolist` is constantly mapping to and from semantic data and its graphic representation, we are using the HTML \textit{dataset} feature to store the semantic data inside the SVG object.
+Since \symbolist is constantly mapping to and from semantic data and its graphic representation, we are using the HTML \textit{dataset} feature to store the semantic data inside the SVG object.
 
 Typically, the `id` attribute is used to quickly identify graphic objects, for the sake of clarity this is being left out of the examples below.
 
@@ -514,6 +506,8 @@ html:
 \label{fig:architecture}}
 \end{figure*}
 
+%The top level symbol will be created in the `top-svg` symbol which is pre-defined in the `index.html` file.
+
 
 \section{Application Structure}\label{subsec:application_structure}
 
@@ -533,6 +527,11 @@ The main structure of the platform is currently in three parts:
 
 discuss using DOM elements for hierarchy and document.querySelector in ui
 and similar options in io using score vs model
+
+
+% internal storage
+The data objects is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
+
 
 maybe this should be renamed ..
 the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
@@ -630,7 +629,7 @@ Note that the system will pass the same call to both definitions, so if both hav
 * \textit{drawsocket}: forwards \drawsocket format messages directly to \drawsocket, bypassing the symbolist mapping.
 
 
-\subsection{Library Definitions API}\label{subsec:library_definitions_api}
+\subsection{Library Definitions API}\label{library_definitions_api}
 
 MENTION CALL METHOD SYSTEM	
 
@@ -756,7 +755,7 @@ Using the template, a basic definition might look like this:
 
 
 
-\subsection{Editor}\label{subsec:editor}
+\section{The \symbolist GUI}\label{editor}
 
 editor section is maybe not that necessary if we are mainly addressing the backend design?
 maybe could be too much information... not sure
