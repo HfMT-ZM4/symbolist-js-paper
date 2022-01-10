@@ -112,27 +112,6 @@
 % ------
 \title{\papertitle}
 
-% Authors
-% Please note that submissions are NOT anonymous, therefore 
-% authors' names have to be VISIBLE in your manuscript. 
-%
-% Single address
-% To use with only one author or several with the same address
-% ---------------
-%\oneauthor
-%   {\firstauthor} {Affiliation \\ City, Country \\
-%     {\tt \href{mailto:author1@adomain.org}{author1@adomain.org}}}
-
-%Two addresses
-%--------------
-% \twoauthors
-%   {\firstauthor} {Affiliation \\ City, Country \\ 
-%     {\tt \href{mailto:author1@adomain.org}{author1@adomain.org}}}
-%   {\secondauthor} {Affiliation \\ City, Country \\ 
-%     {\tt \href{mailto:author2@adomain.org}{author2@adomain.org}}}
-
-% Three addresses
-% --------------
  \threeauthors
    {\firstauthor} { University for Music and Theater \\ Hamburg, Germany \\
      {\tt \href{mailto:rama.gottfried@hfmt-hamburg.de}{rama.gottfried@hfmt-hamburg.de}}}
@@ -148,7 +127,10 @@
 \capstartfalse
 \maketitle
 \capstarttrue
-%
+
+
+% ABSTRACT
+% fill in after finishing the paper
 \begin{abstract}
 
 maybe already start with history here, and then continue to symbolist?
@@ -156,23 +138,33 @@ maybe already start with history here, and then continue to symbolist?
   \symbolist is an in-development application for experimental notation, with the goal of creating a working environment for developing symbolic notation for multimedia which can be interpreted and performed by electronics. The program aims to provide an open play space, with tools for experimentation, and thinking visually about relationships between representation and interpretation in media performance. 
 In the paper we discuss the evaluation and re-design of the application based on the need for a bi-directional mapping framework for working with symbolic notation and its corresponding data representations.
 
-
 \end{abstract}
-%
+
+
+% INTRO
+% not sure what should go here, or how in detail to go
+% I guess:
+% why did I make it, what is it, breifly discuss some of the steps
 
 \section{Background}\label{sec:background}
 
 
-The \symbolist project was developed out of an organic  of compositional notation practice. 
+The \symbolist project was developed out of an organic  
+
+of compositional notation practice. 
 
 how much of a background?
 
 \quote{
-In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC) serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
+In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
 }
 
 Initially developed as a method for performing vector graphics, 
-SVG-OSC
+SVG-OSC  \cite{gottfried2015svg}
+
+\cite{maccallum2015dynamic} %middleware
+\cite{freed2014io} %io
+
 
 XML nature of SVG makes it easy to parse and map just like and OSC bundle.
 
@@ -188,12 +180,12 @@ however it can require a lot of specialized code to handle different hierarchy s
 
 
 the first version of \symbolist was created as a standalone JUCE application
-Ircam/ZKM \cite{gottfried2018symbolist}
+Ircam/ZKM~\cite{gottfried2018symbolist}
 
 \section{JUCE Version}\label{sec:juce_version}
 
 explain juce version (include in overview?)
-MVC
+MVC~\cite{krasner1988description}
 focused on creating SVG and outputting OSC version (like SVG-OSC approach)
 
 
@@ -207,7 +199,6 @@ problem:
 a lot of mapping is still needed
 
 
-\section{Symbolist Electron}\label{sec:symbolist_electron}
 
 \begin{figure*}[ht!]
 \centering
@@ -216,7 +207,11 @@ a lot of mapping is still needed
 \label{fig:screenshot}}
 \end{figure*}
 
-using \drawsocket as front end handler
+\section{Symbolist Electron}\label{sec:symbolist_electron}
+
+using \drawsocket as front end handler \cite{gottfried2019drawsocket}
+
+\cite{hajdu2005quintet}
 
 a general overview about need for classes (actually this comes later when we get into the the discussion of format i.e. the way the data is represented.
 
@@ -263,12 +258,12 @@ Between each of these representation contexts there is a layer of mapping:
 \item mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data.
 \end{itemize}
 
+% mapping figures
 \begin{figure}[ht!]
 \includegraphics[width=1\columnwidth]{data-to-graphic.pdf}
 \caption{\textit{semantic data} mapped to create a \textit{graphic} representation from input data.
 \label{fig:data-to-graphic}}
 \end{figure}
-
 
 \begin{figure}[ht!]
 \includegraphics[width=1\columnwidth]{graphic-to-data.pdf}
@@ -276,12 +271,12 @@ Between each of these representation contexts there is a layer of mapping:
 \label{fig:graphic-to-data}}
 \end{figure}
 
-
 \begin{figure}[ht!]
 \includegraphics[width=1\columnwidth]{score-lookup.pdf}
 \caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
 \label{fig:score-lookup}}
 \end{figure}
+
 
 
 \subsection{Application Structure}\label{subsec:application_structure}
@@ -797,85 +792,15 @@ A typical sequence of creating a score might be as follows:
 \input{james_score}
 
 
-\section{Floats and equations}
-
-\begin{figure*}[ht!]
-\centering
-\includegraphics[width=1.5\columnwidth]{figure}
-\caption{Using \texttt{figure*}, the figure spans two columns. Captions should be placed below the figure, exactly like this.
-\label{fig:example}}
-\end{figure*}
-
-
-\subsection{Figures, Tables and Captions}
-
-\begin{table}[ht!]  % recommented placement insctructiosn for table
-\centering 
-\begin{tabular}{|l|l|}
-  \hline
-  String value & Numeric value \\
-  \hline
-  Hello TENOR  & 2019 \\
-  \hline
- \end{tabular}
- \caption{Table captions placed below the table.}
- \label{tab:example}
-\end{table}
-
-All artwork must be centered, neat, clean, and legible. 
-All lines should be very dark for purposes of reproduction and artwork should not be hand-drawn. The proceedings will be distributed in electronic form only, therefore color figures are allowed.
-However, you may want to check that your figures are understandable even if they are printed in black-and-white. 
-Vectorial figures are preferred. 
-In order to optimize readability, the font size of text within a figure should be at least identical to footnote font size (8pt). 
-If bitmap figures are used, please make sure that the resolution is enough for print quality. 
-
-Figure and tables are numbered consecutively. Place tables/figures in text as close to the reference as possible, and preferably at the top of the page. Inline insertion of figures is preferred. Beware of the overall text and columns formatting when placing figures, in order to avoid blank space at the bottom of columns. 
-Figures and tables may extend across both columns to a maximum width of 17.2cm.
-
-Numbers and captions of figures and tables always ap-pear below the figure/table. Figure and table captions must follow the model below, with 10pt Times font, bold face for figure/table label and number, and a small spat of 3pt before and after. Captions must be justified on the whole column width if composed of several lines, of centered in case of a single line. 
-In principle \LaTeX{} will deal with most of these issues for you.
-
-\textbf{All figures and tables must be referred to in the main text body}, for example: see Figure~\ref{fig:example} and Table~\ref{fig:example} (not Fig.~\ref{fig:example}, or figure~\ref{fig:example}). 
-
-
-%\begin{figure}[t]
-%\figbox{
-%\subfloat[][]{\includegraphics[width=60mm]{figure}\label{fig:subfigex_a}}\\
-%\subfloat[][]{\includegraphics[width=80mm]{figure}\label{fig:subfigex_b}}
-%}
-%\caption{Here's an example using the subfig package.\label{fig:subfigex} }
-%\end{figure}
-
-
-
-\section{Citations}
-
-All bibliographical references should be listed at the end, inside a numbered, first-level heading section titled REFERENCES.
-References must be numbered in order of appearance. 
-Reference numbers in the text should appear within square brackets, such as in~\cite{Someone:13} or~\cite{Someone:13,Someone:04,Someone:09}.
-BibTeX will also handle this for you~\cite{ref:4,ref:online}.
-Do not list references that do not appear in the text. 
-
-Use references preferably for bibliographic items. Prefer footnotes to cite URLs.\footnote{My URL: http://tenor-conference.org/} 
-
-
-
 \section{Conclusions}
-To finish your full-length paper, end it with a conclusion; 
-and after careful editing and a final spell-cheek,
-submit it through the conference Submission System (see call for papers). 
-\underline{Do not} send papers directly by e-mail.
 
 
 \begin{acknowledgments}
-At the end of the Conclusions, acknowledgements to people, projects, funding agencies, etc. can be included using the ``acknowledgments'' environment (similar to second-level heading, with no numbering).
+
 \end{acknowledgments} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%bibliography here
+%bibliography 
 \balance % balance the columns on the last page
-
-% use bibtex to generate the bibliography
-\bibliography{symbolist-bib}
-
+\bibliography{symbolist}
 \end{document}

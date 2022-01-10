@@ -21,32 +21,47 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{wright:osc}
+M.~Wright, ``{Open Sound Control: an enabling technology for musical
+  networking},'' \emph{Organised Sound}, vol.~10, no.~3, pp. 193--200, 2005.
+
+\bibitem{gottfried2015svg}
+R.~Gottfried, ``{SVG to OSC Transcoding: Towards a Platform for Notational
+  Praxis and Electronic Performance},'' in \emph{{Proceedings of the
+  International Conference on Technologies for Notation and Representation
+  (TENOR'15)}}, Paris, France, 2015.
+
+\bibitem{maccallum2015dynamic}
+J.~MacCallum, R.~Gottfried, I.~Rostovtsev, J.~Bresson, and A.~Freed, ``{Dynamic
+  Message-Oriented Middleware with Open Sound Control and Odot},'' in
+  \emph{{Proceedings of the International Computer Music Conference
+  (ICMC'15)}}, Denton, TX, USA, 2015.
+
+\bibitem{freed2014io}
+A.~Freed, D.~DeFilippo, R.~Gottfried, J.~MacCallum, J.~Lubow, D.~Razo, and
+  D.~Wessel, ``{o.io: a Unified Communications Framework for Music, Intermedia
+  and Cloud Interaction.}'' in \emph{ICMC}, 2014.
+
 \bibitem{gottfried2018symbolist}
 R.~Gottfried and J.~Bresson, ``Symbolist: An open authoring environment for
   end-user symbolic notation,'' in \emph{International Conference on
   Technologies for Music Notation and Representation (TENOR'18)}, 2018.
 
-\bibitem{Someone:13}
-A.~Someone, ``{Title of a Conference Paper},'' in \emph{Proceedings of the
-  International Conference on Technologies for Music Notation and
-  Representation (TENOR'15)}, Paris, 2015, pp. 213--218.
+\bibitem{krasner1988description}
+G.~E. Krasner, S.~T. Pope \emph{et~al.}, ``{A Description of the
+  Model-View-Controller User Interface Paradigm in the Smalltalk-80 System},''
+  \emph{Journal of object oriented programming}, vol.~1, no.~3, pp. 26--49,
+  1988.
 
-\bibitem{Someone:04}
-X.~Someone and Y.~Someone, \emph{The Title of a Book}.\hskip 1em plus 0.5em
-  minus 0.4em\relax Springer-Verlag, 2004.
+\bibitem{gottfried2019drawsocket}
+R.~Gottfried and G.~Hajdu, ``Drawsocket: A browser based system for networked
+  score display,'' in \emph{Proceedings of the International Conference on
+  Technologies for Music Notation and Representation--TENOR 2019}.\hskip 1em
+  plus 0.5em minus 0.4em\relax Melbourne, Australia: Monash University, 2019,
+  pp. 15--25.
 
-\bibitem{Someone:09}
-A.~Someone, B.~Someone, and C.~Someone, ``The title of the journal paper,''
-  \emph{J. New Music Research}, vol.~12, no.~2, pp. 111--222, 2009.
-
-\bibitem{ref:4}
-A.~Author, ``{Title of a Book Chapter},'' in \emph{{Book Title}}, X.~Editor1
-  and X.~Editor2, Eds.\hskip 1em plus 0.5em minus 0.4em\relax publisher, 2018.
-
-\bibitem{ref:online}
-\BIBentryALTinterwordspacing
-X.~Author, ``{This is the title of an online text reference}.'' [Online].
-  Available: \url{http://the-address.org}
-\BIBentrySTDinterwordspacing
+\bibitem{hajdu2005quintet}
+G.~Hajdu, ``Quintet. net: An environment for composing and performing music on
+  the internet,'' \emph{Leonardo}, vol.~38, no.~1, pp. 23--30, 2005.
 
 \end{thebibliography}
