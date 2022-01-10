@@ -155,9 +155,8 @@ of compositional notation practice.
 
 how much of a background?
 
-\quote{
+
 In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
-}
 
 Initially developed as a method for performing vector graphics, 
 SVG-OSC  \cite{gottfried2015svg}
@@ -266,7 +265,7 @@ Between each of these representation contexts there is a layer of mapping, with 
 
 \textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time). 
 
-In \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data.
+Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data.
 
 % mapping figures
 
@@ -286,74 +285,31 @@ In \symbolist mapping between \textit{performance media} and \textit{graphic rep
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=0.8\columnwidth]{score-lookup.pdf}
+\includegraphics[width=1\columnwidth]{score-lookup.pdf}
 \caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
 \label{fig:score-lookup}}
 \end{figure}
 
 
 
-\subsection{Application Structure}\label{subsec:application_structure}
+\section{Symbols}\label{subsec:symbols}
 
-The main structure of the platform is currently in three parts:
-
-\begin{enumerate}\itemsep0pt
-\item The \textit{editor}, a browser-based graphic user interface which displays the graphic representation of the data, and allows the user to edit and create new data from graphic interaction. The editor loads a library of scripts that define mappings to and from data and graphics formats. The editor receives and outputs data in the semantic format, keeping the concerns of drawing within the browser-side.
-
-\item The \textit{server}, a node.js (or electron) based webserver which routes messages between the \textit{editor} and the \textit{io} system, and handles operating system commands like reading and writing files.
-
-\item  The \textit{io-server}, which handles input and output from external sources via OSC. The \textit{io-server} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{editor} which define the mapping to (and potentially from) other media sources. The \textit{io-server} might also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
-\end{enumerate}
-
-\begin{figure*}[ht!]
-\centering
-\includegraphics[width=2\columnwidth]{symbolist-architecture.pdf}
-\caption{ \symbolist architecture.
-\label{fig:architecture}}
-\end{figure*}
-
-
-\subsubsection{io and ui elements}\label{subsec:io_ui_elements}
-
-discuss using DOM elements for hierarchy and document.querySelector in ui
-and similar options in io using score vs model
-
-maybe this should be renamed ..
-the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
-
-
-
-\subsection{Symbols}\label{subsec:symbols}
-
-The \textit{semantic data} is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
-
-Each \textit{symbol} is a data object which holds a set of data parameters. For example a typical event like \textit{symbol} might represent a note event, and contain \textit{pitch},  \textit{time} and \textit{duration} parameters. The details of each symbol's data structure and UI interaction is defined in an object \textit{class}.
-
-CHECK IF CONTAINERS STILL EXIST, edit that out probably
-everything can be a container
-IN SCORE, CONTAINER IS USED TO IDENTIFY PARENT ELEMENT (but it's not a class)
-
-
-\textit{symbols} may also be containers that contain other symbols. Container symbols function to frame their contents, giving them reference and context, like a plot graph frame, which provides a perspective for interpreting a set of data points.
-
-In most cases, a symbol mapping definition will require querying the parent container symbol for information, to plot the data into the container frame's context. 
-
-All symbols are stored in container symbols. 
->> this is true but out of date, any symbol can have "contents" <<
+In \symbolist terminology a \textit{symbol} is an instance of a symbolic representation of data that connects the semantic, graphic, and possibly other media types of expression together as a multifaceted unit.
+Each \textit{symbol} is defined as a \textit{class} of object, which specifies the symbol's data structure and UI interaction, and data mapping to different representational contexts.
 
 \subsection{Data Format}\label{subsec:format}
 
-Data is stored in JSON format.
+Within the \symbolist application, semantic data is stored as javascript objects, and read/written in JSON format~\cite{crockford2012json}, which is transcoded to and from OSC for inter-application communication.
 
-The main object data attributes are:
-\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
-\item \textit{id}: a unique identifier name.
-\item \textit{class}: a reference to the definition of the object type in the user-definition library.
-\item \textit{contents}: an array of other objects that a container object holds.
+The main attributes used for \symbolist semantic data objects are:
+
+\begin{itemize}\itemsep0pt 
+\item \textit{id}: a unique identifier name (required).
+\item \textit{class}: a reference to the definition of the object type in the user-definition library (required).
+\item \textit{contents}: an array of child objects that a parent container object might hold (required for container symbols).
 \end{itemize}
 
-For example a simple \textit{symbol} object might look like:
-
+In addition to the required \textit{id} and \textit{class} attributes, symbol objects may include any number of other \textit{attributes}~\footnote{The term \textit{attribute} is used here interchangeably with properties, parameters, aspects, etc.} of the symbol (\textit{pitch}, \textit{amplitude}, etc.). For example a simple semantic object written in JSON might look like:
 
 \begin{lstlisting}[
   mathescape,
@@ -369,10 +325,14 @@ For example a simple \textit{symbol} object might look like:
 }
 \end{lstlisting}
 
+\noindent
+Here we see an object with the \textit{id} ``foo,'' which is of \textit{class} type ``legs'', that has an attribute \textit{action} associated with it and a start time.
 
-Here we see an object with the \textit{id} ``foo,'' which is of class type \textit{legs}, that has an attribute \textit{action} associated with it and a start time.
+\subsection{Containers}
+Symbols may also contain other symbols. 
+Container symbols function to frame their contents, giving reference and context, like a plot graph frame, which provides a perspective for interpreting a set of data points.
 
-Symbols can also be containers of other symbols, for example an imaginary class \textit{timeline}, which holds two types of leg actions, might look like this:
+When a symbol contains other symbols, the child symbols are stored as an array in the object's \textit{contents} field. For example an imaginary class \textit{timeline}, which holds two types of leg actions, might look like this:
 
 \begin{lstlisting}[
   mathescape,
@@ -399,7 +359,14 @@ Symbols can also be containers of other symbols, for example an imaginary class 
 
 \end{lstlisting}
 
+% move this to the definitions discussion?
+In most cases, a symbol's mapping definition will require querying its parent symbol for information, to plot its data relative to the container context, for example offsetting the screen coordinate position based on the parent object position.
+
+% there are two top level symbols: top-svg and top-html, not sure if we need to say that here or not... probably not
+
 \subsection{Score, File Format}\label{}
+
+The \textit{semantic data} is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
 
 Using symbols and symbol containers, we can create tree structures which can be used to represent hierarchical grouping; to represent scores, or other types of data structures.
 
@@ -538,6 +505,37 @@ html:
 \end{lstlisting}
 
 
+
+
+\begin{figure*}[ht!]
+\centering
+\includegraphics[width=2\columnwidth]{symbolist-architecture.pdf}
+\caption{ \symbolist architecture.
+\label{fig:architecture}}
+\end{figure*}
+
+
+\section{Application Structure}\label{subsec:application_structure}
+
+The main structure of the platform is currently in three parts:
+
+\begin{enumerate}\itemsep0pt
+\item The \textit{editor}, a browser-based graphic user interface which displays the graphic representation of the data, and allows the user to edit and create new data from graphic interaction. The editor loads a library of scripts that define mappings to and from data and graphics formats. The editor receives and outputs data in the semantic format, keeping the concerns of drawing within the browser-side.
+
+\item The \textit{server}, a node.js (or electron) based webserver which routes messages between the \textit{editor} and the \textit{io} system, and handles operating system commands like reading and writing files.
+
+\item  The \textit{io-server}, which handles input and output from external sources via OSC. The \textit{io-server} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{editor} which define the mapping to (and potentially from) other media sources. The \textit{io-server} might also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
+\end{enumerate}
+
+
+
+\subsubsection{io and ui elements}\label{subsec:io_ui_elements}
+
+discuss using DOM elements for hierarchy and document.querySelector in ui
+and similar options in io using score vs model
+
+maybe this should be renamed ..
+the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
 
 
 \subsection{IO Messages}\label{subsec:io_messages}
