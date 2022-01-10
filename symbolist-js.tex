@@ -241,7 +241,7 @@ The \textit{graphic representation} of the information is a visual representatio
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=0.8\columnwidth]{graphic-representation.pdf}
+\includegraphics[width=1\columnwidth]{graphic-representation.pdf}
 \caption{\textit{data} vs \textit{graphic} representation of the same information.
 \label{fig:graphic-representation}}
 \end{figure}
@@ -268,14 +268,14 @@ Between each of these representation contexts there is a layer of mapping, with 
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=0.8\columnwidth]{data-to-graphic.pdf}
+\includegraphics[width=0.9\columnwidth]{data-to-graphic.pdf}
 \caption{\textit{semantic data} mapped to create a \textit{graphic} representation from input data.
 \label{fig:data-to-graphic}}
 \end{figure}
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=0.8\columnwidth]{graphic-to-data.pdf}
+\includegraphics[width=0.9\columnwidth]{graphic-to-data.pdf}
 \caption{If edited graphically, the updated graphic data is then mapped back to \textit{semantic data} representation. 
 \label{fig:graphic-to-data}}
 \end{figure}
@@ -494,6 +494,59 @@ For example, mapping our imaginary ``legs'' actions above, the corresponding SVG
 %The top level symbol will be created in the `top-svg` symbol which is pre-defined in the `index.html` file.
 
 
+%this should maybe all be moved up above the API and IO messages?
+\section{UX: Graphical Authoring and Interaction}\label{editor}
+
+editor section is maybe not that necessary if we are mainly addressing the backend design?
+maybe could be too much information... not sure
+
+but, the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
+
+
+The graphic user interface of \textit{symbolist} is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
+
+In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. Rather, the interaction and meanings of the symbols are defined in a library of object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. Definitions can be shared and loaded to setup different composition environments.
+
+See below for more information about the API for creating symbol definitions. 
+
+\subsubsection{Interface Components}\label{subsec:interface_components}
+
+%main interesting thing to talk about is the palette system
+
+The \symbolist graphic editor provides a set of basic tools for creating scores using the defined symbols and containers:
+\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
+\item \textit{document view}: the top level view of the application window.
+\item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
+\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the `symbols` that have been defined for the current selected \textit{container}. 
+\item \textit{tools}: (not yet implemented in the current version) a set of interactive tools that provide ways of creating new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
+\item \textit{inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
+\end{itemize}
+
+On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
+
+A typical sequence of creating a score might be as follows:
+\begin{enumerate}\itemsep0pt
+\item the user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
+\item selecting the "paper" container rectangle, the user then sets the container as the new `context`, by pressing the `[s]` key (or selecting from the application menu).
+\item once setting the context, the `palette` toolbar is populated with icons of symbols that are defined with the selected container context type.
+\item clicking on one of the symbol icons, puts the interface into "creation" or "palette mode", where the mouse interaction is now designed for use with this specific symbol type.
+\item holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
+\item after clicking the symbol is placed in the container.
+\item depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
+\item selecting the symbol and hitting the `[i]` button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
+\item selecting and pressing the `[e]` button enters "edit mode" which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
+\end{enumerate}
+
+
+\subsection{Modes}
+maybe this should just be a list
+\subsubsection{Palette and Creation}
+\subsubsection{Selection, Click and Drag}
+\subsubsection{Inspector}
+\subsubsection{Edit}
+
+
+
 \section{Application Structure}\label{subsec:application_structure}
 
 The main structure of the platform is currently in three parts:
@@ -521,100 +574,7 @@ The data objects is stored in a \textit{model} or \textit{score} which is made u
 maybe this should be renamed ..
 the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
 
-
-\subsection{IO Messages}\label{subsec:io_messages}
-
-\symbolist has built in handlers for a set of messages received via OSC, which can be extended by user scripts, using a key/val syntax, where the \textit{key} specifies the function to call, and the \textit{val} are the parameter values to use for the call.
-
-For example, here is a \textit{lookup} query to find elements that are returned by the parameters \textit{time} in the container with the \textit{id} ``trio''.
-
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-{
-    /key : "lookup:,
-    /val : {
-        /time : 0.1,
-        /id : "trio"
-    }
-}
-
-\end{lstlisting}
-
-The OSC message API supports the following keys:
-\begin{itemize}\itemsep0pt 
-\item \textit{data}: adds a data object to the score, and sends to the ui to be mapped to graphical representation. Parameters include:
-\begin{itemize}\itemsep0pt 
-  \item \textit{class} (required) the class type of the object to create
-  \item \textit{container} (required) the container symbol class to put the object in (in case there are multiple containers that support the same symbol type)
-  \item \textit{id} (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
-  \item Other required or optional parameters will depend on the symbol definition.
-\end{itemize}
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-{
-    /key : "data",
-    /val : {
-        /class : "fiveLineStaveEvent",
-        /id : "foo"
-        /container : "oboe",
-	    /time : 0.13622,
-	    /ratio : "7/4",
-	    /duration : 0.1,
-	    /amp : 1
-    }
-  }
-\end{lstlisting}
-
-
-\item \textit{lookup}: looks up a point in a container, based on a sorting function specified in the definition. For example, this can be used to get all events active at a given time. Parameters:
-
-\begin{itemize}\itemsep0pt 
-  \item \textit{id}: (required) the \textit{id} of the container to lookup in. Containers will generally iterate all child objects, so for example if you use the \textit{id} of the top level score you should be looking up in to all sub-containers.
-  \end{itemize}
-  
-\item \textit{getFormattedLookup}: optional function that might be defined in an \textit{io} script that outputs an object formatted for a different type of player/render. For example, this function might return a list of \textit{/x} and \textit{/y} values for use with the \textit{o.lookup~} Max object, or create a MIDI file export etc. All parameters included in the \textit{val} object will be sent to the \textit{getFormattedLookup} as a parameters object. Parameters:
-
-\begin{itemize}\itemsep0pt 
-  \item \textit{id}: (required)
-\end{itemize}
-\item \textit{call}: calls a function in the one or both of the class definitions. All of the parameters in the \textit{val} object will be passed to the function as an argument. Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
-\begin{itemize}\itemsep0pt 
-  \item \textit{class} (required) class of the object to call
-  \item \textit{method} (required) name of object function to call
-\end{itemize}
-
-\end{itemize}
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-{
-    /key : "call",
-    /val : {
-        /function : "functionName",
-        /class : "className",
-        /id : "foo"
-        /someValue : 1,
-        /anotherValue : 2
-    }
-}
-\end{lstlisting}
-
-Note that the system will pass the same call to both definitions, so if both have a function of the same name they will both be called.
-* \textit{drawsocket}: forwards \drawsocket format messages directly to \drawsocket, bypassing the symbolist mapping.
-
-
-\subsection{Library Definitions API}\label{library_definitions_api}
+\section{Symbol Library Definitions API}\label{library_definitions_api}
 
 MENTION CALL METHOD SYSTEM	
 
@@ -740,50 +700,96 @@ Using the template, a basic definition might look like this:
 %
 
 
+\section{IO Messages}\label{subsec:io_messages}
+
+\symbolist has built in handlers for a set of messages received via OSC, which can be extended by user scripts, using a key/val syntax, where the \textit{key} specifies the function to call, and the \textit{val} are the parameter values to use for the call.
+
+For example, here is a \textit{lookup} query to find elements that are returned by the parameters \textit{time} in the container with the \textit{id} ``trio''.
 
 
-\section{The \symbolist GUI}\label{editor}
+\begin{lstlisting}[
+  mathescape,
+  columns=fullflexible,
+  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
+]
+{
+    /key : "lookup:,
+    /val : {
+        /time : 0.1,
+        /id : "trio"
+    }
+}
 
-editor section is maybe not that necessary if we are mainly addressing the backend design?
-maybe could be too much information... not sure
+\end{lstlisting}
 
-but, the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
-
-
-The graphic user interface of \textit{symbolist} is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
-
-In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. Rather, the interaction and meanings of the symbols are defined in a library of object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. Definitions can be shared and loaded to setup different composition environments.
-
-See below for more information about the API for creating symbol definitions. 
-
-\subsubsection{Interface Components}\label{subsec:interface_components}
-
-%main interesting thing to talk about is the palette system
-
-The \symbolist graphic editor provides a set of basic tools for creating scores using the defined symbols and containers:
-\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
-\item \textit{document view}: the top level view of the application window.
-\item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
-\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the `symbols` that have been defined for the current selected \textit{container}. 
-\item \textit{tools}: (not yet implemented in the current version) a set of interactive tools that provide ways of creating new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
-\item \textit{inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
+The OSC message API supports the following keys:
+\begin{itemize}\itemsep0pt 
+\item \textit{data}: adds a data object to the score, and sends to the ui to be mapped to graphical representation. Parameters include:
+\begin{itemize}\itemsep0pt 
+  \item \textit{class} (required) the class type of the object to create
+  \item \textit{container} (required) the container symbol class to put the object in (in case there are multiple containers that support the same symbol type)
+  \item \textit{id} (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
+  \item Other required or optional parameters will depend on the symbol definition.
 \end{itemize}
 
-On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
+\begin{lstlisting}[
+  mathescape,
+  columns=fullflexible,
+  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
+]
+{
+    /key : "data",
+    /val : {
+        /class : "fiveLineStaveEvent",
+        /id : "foo"
+        /container : "oboe",
+	    /time : 0.13622,
+	    /ratio : "7/4",
+	    /duration : 0.1,
+	    /amp : 1
+    }
+  }
+\end{lstlisting}
 
-A typical sequence of creating a score might be as follows:
-\begin{enumerate}\itemsep0pt
-\item the user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
-\item selecting the "paper" container rectangle, the user then sets the container as the new `context`, by pressing the `[s]` key (or selecting from the application menu).
-\item once setting the context, the `palette` toolbar is populated with icons of symbols that are defined with the selected container context type.
-\item clicking on one of the symbol icons, puts the interface into "creation" or "palette mode", where the mouse interaction is now designed for use with this specific symbol type.
-\item holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
-\item after clicking the symbol is placed in the container.
-\item depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
-\item selecting the symbol and hitting the `[i]` button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
-\item selecting and pressing the `[e]` button enters "edit mode" which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
-\end{enumerate}
 
+\item \textit{lookup}: looks up a point in a container, based on a sorting function specified in the definition. For example, this can be used to get all events active at a given time. Parameters:
+
+\begin{itemize}\itemsep0pt 
+  \item \textit{id}: (required) the \textit{id} of the container to lookup in. Containers will generally iterate all child objects, so for example if you use the \textit{id} of the top level score you should be looking up in to all sub-containers.
+  \end{itemize}
+  
+\item \textit{getFormattedLookup}: optional function that might be defined in an \textit{io} script that outputs an object formatted for a different type of player/render. For example, this function might return a list of \textit{/x} and \textit{/y} values for use with the \textit{o.lookup~} Max object, or create a MIDI file export etc. All parameters included in the \textit{val} object will be sent to the \textit{getFormattedLookup} as a parameters object. Parameters:
+
+\begin{itemize}\itemsep0pt 
+  \item \textit{id}: (required)
+\end{itemize}
+\item \textit{call}: calls a function in the one or both of the class definitions. All of the parameters in the \textit{val} object will be passed to the function as an argument. Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
+\begin{itemize}\itemsep0pt 
+  \item \textit{class} (required) class of the object to call
+  \item \textit{method} (required) name of object function to call
+\end{itemize}
+
+\end{itemize}
+
+\begin{lstlisting}[
+  mathescape,
+  columns=fullflexible,
+  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
+]
+{
+    /key : "call",
+    /val : {
+        /function : "functionName",
+        /class : "className",
+        /id : "foo"
+        /someValue : 1,
+        /anotherValue : 2
+    }
+}
+\end{lstlisting}
+
+Note that the system will pass the same call to both definitions, so if both have a function of the same name they will both be called.
+* \textit{drawsocket}: forwards \drawsocket format messages directly to \drawsocket, bypassing the symbolist mapping.
 
 
 
