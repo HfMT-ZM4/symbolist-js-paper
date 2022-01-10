@@ -224,10 +224,83 @@ Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
 \end{figure*}
 
 
-\subsection{Implementations}\label{sec:implementations}
+\section{Implementations}\label{sec:implementations}
 
 Electron version (node + chrome w/ special electron IPC)
 Max version (node + jweb + Max patch for IPC)
+
+
+\begin{figure*}[ht!]
+\centering
+\includegraphics[width=2\columnwidth]{symbolist-architecture2.pdf}
+\caption{ \symbolist architecture.
+\label{fig:architecture}}
+\end{figure*}
+
+
+\subsection{Application Structure}\label{subsec:application_structure}
+
+The main structure of the platform is currently in three parts:
+
+\begin{enumerate}\itemsep0pt
+\item The \textit{editor}, a browser-based graphic user interface which displays the graphic representation of the data, and allows the user to edit and create new data from graphic interaction. The editor loads a library of scripts that define mappings to and from data and graphics formats. The editor receives and outputs data in the semantic format, keeping the concerns of drawing within the browser-side.
+
+\item The \textit{server}, a node.js (or electron) based webserver which routes messages between the \textit{editor} and the \textit{io} system, and handles operating system commands like reading and writing files.
+
+\item  The \textit{io-server}, which handles input and output from external sources via OSC. The \textit{io-server} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{editor} which define the mapping to (and potentially from) other media sources. The \textit{io-server} might also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
+\end{enumerate}
+
+
+\section{Graphical Authoring and Interaction}\label{editor} %should this be before or after the application structure?
+
+%the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
+
+The graphic user interface of \symbolist is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
+
+In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. Rather, the interaction and meanings of the symbols are defined in a library of object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. Definitions can be shared and loaded to setup different composition environments.
+
+%See below for more information about the API for creating symbol definitions. 
+
+\subsection{Interface Components}\label{subsec:interface_components}
+
+%main interesting thing to talk about is the palette system
+
+The \symbolist graphic editor (shown in figure~\ref{fig:screenshot}) provides a set of basic tools for creating scores using the defined symbols and containers:
+\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
+\item \textit{document view}: the top level view of the application window.
+\item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
+\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
+\item \textit{tools}: a set of buttons that open tools for custom computer-assisted generation of new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
+\item \textit{inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
+\end{itemize}
+
+\subsection{Modes}
+maybe this should just be a list
+\subsubsection{Palette and Creation}
+\subsubsection{Selection, Click and Drag}
+\subsubsection{Inspector}
+\subsubsection{Edit}
+
+
+\subsection{User Experience}\label{ux}
+
+On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
+
+A typical sequence of creating a score might be as follows:
+\begin{enumerate}\itemsep0pt
+\item The user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
+\item Selecting the ``paper'' container rectangle, the user then sets the container as the new \textit{context}, by pressing the [s] key (or selecting from the application menu).
+\item Once setting the context, the \textit{palette} toolbar is populated with icons of symbols that are defined with the selected container context type.
+\item Clicking on one of the symbol icons, puts the interface into \textit{creation} / \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
+\item Holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
+\item After clicking the symbol is placed in the container.
+\item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
+\item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
+\item Selecting and pressing the [e] button enters \textit{edit mode} which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
+\end{enumerate}
+
+
+
 
 \section{Data Representation}\label{subsec:representation}
 
@@ -244,47 +317,6 @@ The \textit{graphic representation} of the information is a visual representatio
 \includegraphics[width=1\columnwidth]{graphic-representation.pdf}
 \caption{\textit{data} vs \textit{graphic} representation of the same information.
 \label{fig:graphic-representation}}
-\end{figure}
-
-\subsection{Performing Data}
-
-Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
-
-\symbolist provides several different options for sorting and looking up data (see figure~\ref{fig:score-lookup}), which can serve as a structure for the performance of a ``score'', or other data formats. Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author (see section \ref{subsec:io_messages} for further discussion of performing data). 
-
-In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
-
-\subsection{Mapping}\label{subsec:mapping}
-
-Between each of these representation contexts there is a layer of mapping, with the \textit{semantic data} serving as the primary representation type. 
-
-\textit{Semantic data to graphic representation} mapping (figure~\ref{fig:data-to-graphic}) is used for the creation of graphic symbols from a stream of input, for example from generative processes, textural authoring, or computer assisted composition systems~\cite{bresson2011om, didkovsky2008maxscore, agostini2015max, baca2015abjad, burloiu2017visual}.
-
-\textit{Graphic representation to semantic data} mapping (figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
-
-\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).~\footnote{Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.}
-
-% mapping figures
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.9\columnwidth]{data-to-graphic.pdf}
-\caption{\textit{semantic data} mapped to create a \textit{graphic} representation from input data.
-\label{fig:data-to-graphic}}
-\end{figure}
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.9\columnwidth]{graphic-to-data.pdf}
-\caption{If edited graphically, the updated graphic data is then mapped back to \textit{semantic data} representation. 
-\label{fig:graphic-to-data}}
-\end{figure}
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=1\columnwidth]{score-lookup.pdf}
-\caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
-\label{fig:score-lookup}}
 \end{figure}
 
 
@@ -484,78 +516,52 @@ For example, mapping our imaginary ``legs'' actions above, the corresponding SVG
 \end{minipage}
 
 
-\begin{figure*}[ht!]
+
+
+\subsection{Performing Data}
+
+Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
+
+\symbolist provides several different options for sorting and looking up data (see figure~\ref{fig:score-lookup}), which can serve as a structure for the performance of a ``score'', or other data formats. Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author (see section \ref{subsec:io_messages} for further discussion of performing data). 
+
+In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
+
+\subsection{Mapping}\label{subsec:mapping}
+
+Between each of these representation contexts there is a layer of mapping, with the \textit{semantic data} serving as the primary representation type. 
+
+\textit{Semantic data to graphic representation} mapping (figure~\ref{fig:data-to-graphic}) is used for the creation of graphic symbols from a stream of input, for example from generative processes, textural authoring, or computer assisted composition systems~\cite{bresson2011om, didkovsky2008maxscore, agostini2015max, baca2015abjad, burloiu2017visual}.
+
+\textit{Graphic representation to semantic data} mapping (figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
+
+\textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).~\footnote{Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.}
+
+% mapping figures
+
+\begin{figure}[ht!]
 \centering
-\includegraphics[width=2\columnwidth]{symbolist-architecture2.pdf}
-\caption{ \symbolist architecture.
-\label{fig:architecture}}
-\end{figure*}
+\includegraphics[width=0.9\columnwidth]{data-to-graphic.pdf}
+\caption{\textit{semantic data} mapped to create a \textit{graphic} representation from input data.
+\label{fig:data-to-graphic}}
+\end{figure}
 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.9\columnwidth]{graphic-to-data.pdf}
+\caption{If edited graphically, the updated graphic data is then mapped back to \textit{semantic data} representation. 
+\label{fig:graphic-to-data}}
+\end{figure}
 
-\section{Graphical Authoring and Interaction}\label{editor} %should this be before or after the application structure?
-
-%the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
-
-The graphic user interface of \symbolist is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
-
-In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. Rather, the interaction and meanings of the symbols are defined in a library of object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. Definitions can be shared and loaded to setup different composition environments.
-
-%See below for more information about the API for creating symbol definitions. 
-
-\subsection{Interface Components}\label{subsec:interface_components}
-
-%main interesting thing to talk about is the palette system
-
-The \symbolist graphic editor (shown in figure~\ref{fig:screenshot}) provides a set of basic tools for creating scores using the defined symbols and containers:
-\begin{itemize}\itemsep0pt % use \itemsep if necessary to reduce space between items
-\item \textit{document view}: the top level view of the application window.
-\item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
-\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
-\item \textit{tools}: a set of buttons that open tools for custom computer-assisted generation of new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
-\item \textit{inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
-\end{itemize}
-
-\subsection{Modes}
-maybe this should just be a list
-\subsubsection{Palette and Creation}
-\subsubsection{Selection, Click and Drag}
-\subsubsection{Inspector}
-\subsubsection{Edit}
-
-
-\subsection{User Experience}\label{ux}
-
-On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
-
-A typical sequence of creating a score might be as follows:
-\begin{enumerate}\itemsep0pt
-\item The user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
-\item Selecting the ``paper'' container rectangle, the user then sets the container as the new \textit{context}, by pressing the [s] key (or selecting from the application menu).
-\item Once setting the context, the \textit{palette} toolbar is populated with icons of symbols that are defined with the selected container context type.
-\item Clicking on one of the symbol icons, puts the interface into \textit{creation} / \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
-\item Holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
-\item After clicking the symbol is placed in the container.
-\item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
-\item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
-\item Selecting and pressing the [e] button enters \textit{edit mode} which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
-\end{enumerate}
-
-
-\section{Application Structure}\label{subsec:application_structure}
-
-The main structure of the platform is currently in three parts:
-
-\begin{enumerate}\itemsep0pt
-\item The \textit{editor}, a browser-based graphic user interface which displays the graphic representation of the data, and allows the user to edit and create new data from graphic interaction. The editor loads a library of scripts that define mappings to and from data and graphics formats. The editor receives and outputs data in the semantic format, keeping the concerns of drawing within the browser-side.
-
-\item The \textit{server}, a node.js (or electron) based webserver which routes messages between the \textit{editor} and the \textit{io} system, and handles operating system commands like reading and writing files.
-
-\item  The \textit{io-server}, which handles input and output from external sources via OSC. The \textit{io-server} holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \textit{editor} which define the mapping to (and potentially from) other media sources. The \textit{io-server} might also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
-\end{enumerate}
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=1\columnwidth]{score-lookup.pdf}
+\caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
+\label{fig:score-lookup}}
+\end{figure}
 
 
 
-\subsubsection{io and ui elements}\label{subsec:io_ui_elements}
+\subsection{io and ui elements}\label{subsec:io_ui_elements}
 
 discuss using DOM elements for hierarchy and js document.querySelector in ui
 and similar options in io using score vs model
