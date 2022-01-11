@@ -150,13 +150,11 @@ In the paper we discuss the evaluation and re-design of the application based on
 
 \section{Background}\label{sec:background}
 
-
 The \symbolist project was developed out of an organic  
 
 of compositional notation practice. 
 
 how much of a background?
-
 
 In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\cite{world2000scalable}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
 
@@ -172,8 +170,6 @@ XML nature of SVG makes it easy to parse and map just like and OSC bundle.
 drawing on the OSC research at CNMAT, 
 
 just like a piece of paper, SVG could be freely mappable, and \textit{performable} like OSC.
-
-
 
 
 
@@ -200,14 +196,19 @@ idea of Clefs
 problem:
 a lot of mapping is still needed
 
+% drawsocket
 \subsection{Drawsocket}\label{sec:drawsocket}
 
-
-\section{Symbolist Electron}\label{sec:symbolist_electron}
-
-using \drawsocket as front end handler \cite{gottfried2019drawsocket}
-
+\cite{gottfried2019drawsocket}
 \cite{hajdu2005quintet}
+
+
+
+% Symbolist JS
+\section{Symbolist JS}\label{sec:symbolist_js}
+
+using \drawsocket as front end handler 
+
 
 a general overview about need for classes (actually this comes later when we get into the the discussion of format i.e. the way the data is represented.
 
@@ -226,6 +227,7 @@ Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
 \end{figure*}
 
 
+% Implementations
 \section{Implementations}\label{sec:implementations}
 
 Electron\footnote{https://www.electronjs.org/} version (node + chrome w/ special electron IPC)
@@ -239,67 +241,83 @@ Max version (node + jweb + Max patch for IPC)
 \label{fig:architecture}}
 \end{figure*}
 
+% Application Structure
+\subsection{Application Structure}\label{sec:application_structure}
 
-\subsection{Application Structure}\label{subsec:application_structure}
-
-The main architecture of the platform (figure~\ref{fig:architecture}) is organized as a server-client model, comprising of:
+\symbolist is organized as a server-client model, comprising of:
 
 \begin{enumerate}\itemsep0pt 
-\item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \uicontroller runs in the browser handling interaction, via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
+\item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \uicontroller runs in the browser (see figure~\ref{fig:architecture}), and handles interaction via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
 
-\item The \textit{symbolist server}, which is comprised of: 
+\item The \textit{symbolist server} runs in node.js (either in the context of Electron, or in Max's node.script object) and is comprised of: 
 \begin{itemize}\itemsep0pt 
 
-\item A node.js (Electron) based web-server which serves the main editor webpage via HTTP, and routes messages between the \uicontroller and the \iocontroller via WebSockets, and handles operating system commands like reading and writing files.
+\item A HTTP web-server which serves the editor webpage, and manages messages between the \uicontroller and the \iocontroller via WebSocket connection, as well as handling operating system commands like reading and writing files.
 
-\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket. The \iocontroller holds a copy of the score in its semantic format, and loads a parallel library of user scripts to the \uicontroller which define the mapping to (and potentially from) other media sources. The \iocontroller can also be used to reformat the score into a format that can be performed by another sequencing tool or program like MaxMSP.
+\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket. 
 \end{itemize}
-
 \end{enumerate}
 
+The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. The \iocontroller can also be used to translate the score into other formats that can be performed by another sequencing tool or program like MaxMSP.
 
-\section{Graphical Authoring and Interaction}\label{editor} %should this be before or after the application structure?
+
+
+\section{Graphical Authoring and Interaction}\label{sec:editor} %should this be before or after the application structure?
 
 %the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
 
-The graphic user interface of \symbolist is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols} are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
+The graphic user interface of \symbolist (figure~\ref{fig:screenshot}) is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols}, are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
 
-In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. Rather, the interaction and meanings of the symbols are defined in a library of object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. Definitions can be shared and loaded to setup different composition environments.
+In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. 
+Rather, the interaction and meanings of the symbols are defined in a library of custom object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. 
+Definitions can be shared between users and provide a mechanism to setup tailored composition environments for different authoring situations.
 
 %See below for more information about the API for creating symbol definitions. 
 
-\subsection{Interface Components}\label{subsec:interface_components}
+\subsection{Interface Components}\label{sec:interface_components}
 
 %main interesting thing to talk about is the palette system
 
-The \symbolist graphic editor (shown in figure~\ref{fig:screenshot}) provides a set of basic tools for creating scores using the defined symbols and containers:
+Since the application is programmed using web-brower technologies (JS/HTML/CSS/SVG) there are many ways to customize the layout, using CSS, or defining new object types. 
+The default \symbolist graphic editor (figure~\ref{fig:screenshot}) provides the basic mechanisms for user interaction, to create scores through the creation of hierarchical object relationships.
+The main graphic components are:
+
 \begin{itemize}\itemsep0pt 
-\item \textit{document view}: the top level view of the application window.
-\item \textit{menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
-\item \textit{palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
-\item \textit{tools}: a set of buttons that open tools for custom computer-assisted generation of new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
-\item \textit{inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
+\item 
+\textit{Document view}: the top level view of the application window, containing the document, and side bar. Sliders are provided to offset the view of the document, as well as basic zoom functionality.
+\item 
+\textit{Palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
+\item 
+\textit{Tools}: a set of buttons that open tools for custom computer-assisted generation of new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
+\item 
+\textit{Inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
+\item 
+\textit{Menu bar}: (Electron version only) the menu bar at the top of the screen or window, which provides access to various application functions.
 \end{itemize}
 
-\subsection{Modes}
-maybe this should just be a list
-\subsubsection{Palette and Creation}
-\subsubsection{Selection, Click and Drag}
-\subsubsection{Inspector}
-\subsubsection{Edit}
+\subsection{Modes}\label{sec:modes}
 
+In the process of working in \symbolist, the user will shift between different modes, each of which have user-definable behaviors in the definitions library.
+The current modes are:
+\begin{itemize}\itemsep0pt 
+\item \textit{Palette}: clicking on an icon in the palette sidebar enables the user interaction assigned to the clicked symbol type.
+\item \textit{Creation}: holding down the CMD key (Mac) enters \textit{creation mode}, telling \symbolist to create a new \textit{symbol} of the type selected in the palette, similarly this action may enable different types of user interaction, for example snapping the symbol to specified pixels, etc.
+\item \textit{Selection}: clicking on a pre-existing \textit{symbol} in the document will \textit{select} the object, which notifies a callback in the definition script for possible interaction.
+\item \textit{Edit}: if a user has selected an object and then types the letter [e], \symbolist will attempt to enter \textit{edit mode} if there is one defined in the symbol definition script. This is useful for example in the case of a bezier curve; entering \textit{edit mode} could make visible the handles for the curve for editing.
+\item \textit{Inspector}: if a user has selected an object and then types the letter [i], an inspector window appears showing the \textit{semantic data} corresponding to the symbol's graphical information (datatypes are discussed further in section~\ref{sec:representation} below).
+\end{itemize}
 
-\subsection{User Experience}\label{ux}
+% UX
 
-On entering the application, the editor loads a score or initialization file from the default load folder, or you can load a new config file after loading. The config file sets the top-level page setup and palette options.
+\subsection{User Experience}\label{sec:ux}
 
-A typical sequence of creating a score might be as follows:
+On entering the application, the editor loads a score or configuration file from the default load folder, which sets the top-level page setup and palette options. A typical sequence of creating a score might be as follows:
 \begin{enumerate}\itemsep0pt
-\item The user opens a workspace, with one or more containers displayed on the screen, for example an empty rectangle which is like a piece of paper.
-\item Selecting the ``paper'' container rectangle, the user then sets the container as the new \textit{context}, by pressing the [s] key (or selecting from the application menu).
-\item Once setting the context, the \textit{palette} toolbar is populated with icons of symbols that are defined with the selected container context type.
-\item Clicking on one of the symbol icons, puts the interface into \textit{creation} / \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
-\item Holding the CMD button, creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
+\item The user opens a workspace, with one or more default \textit{container symbols} displayed on the screen, for example an empty rectangle which is like a piece of paper.
+\item Selecting the ``paper'' container rectangle, the user then selects the container as the new \textit{context} by pressing the [s] key (or from the application menu).
+\item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
+\item Clicking on one of the palette toolbar symbol icons, puts the interface into \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
+\item Holding the Mac CMD button enters \textit{creation mode} and by default creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
 \item After clicking the symbol is placed in the container.
 \item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
 \item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
@@ -307,16 +325,14 @@ A typical sequence of creating a score might be as follows:
 \end{enumerate}
 
 
-
-
-\section{Data Representation}\label{subsec:representation}
+\section{Data Representation}\label{sec:representation}
 
 At the heart of \symbolist are two parallel forms of information expression: \textit{semantic data} and \textit{graphic representation} (figure~\ref{fig:graphic-representation}).
 
 \textit{Semantic data} specifies the various attributes of information about a symbolic object, in terms of the object's meaning to the author. 
-For example, the meaningful attributes of a \textit{note} object might be information about pitch and duration, or a \textit{point} object might contain x, y, and z values corresponding to the point's location in 3D space. In \symbolist \textit{semantic data} is thought of as the main holder of information in the system, which arranged as a score can function like a database of hierarchal information (further explained in section \ref{subsec:file_format} below).
+For example, the meaningful attributes of a \textit{note} object might be information about pitch and duration, or a \textit{point} object might contain x, y, and z values corresponding to the point's location in 3D space. In \symbolist \textit{semantic data} is thought of as the main holder of information in the system, which through grouping and hierarchical arrangement can be used to represent scores or other types of data structures.
 
-The \textit{graphic representation} of the information is a visual representation of the semantic data, which is open in nature. The aim of \symbolist is to provide an agnostic framework for developing visual, symbolic, or other unknown representations of semantic data for use in multimedia composition practice; and so, one of the main functions of the new version of the software is to facilitate the creation of mapping relationships between different representations of the data (see figure~\ref{fig:graphic-representation}).
+The \textit{graphic representation} of the information is a visual expression of the semantic data, which is open in nature. The aim of \symbolist is to provide an agnostic framework for developing visual, symbolic, or other unknown representations of semantic data for use in multimedia composition practice; and so, one of the main functions of the new version of the software is to facilitate the creation of mapping relationships between different representations of the data.
 
 
 \begin{figure}[ht!]
@@ -328,16 +344,16 @@ The \textit{graphic representation} of the information is a visual representatio
 
 
 
-\section{Symbols}\label{subsec:symbols}
+\section{Symbols}\label{sec:symbols}
 
-In \symbolist terminology a \textit{symbol} is an instance of a symbolic representation of data that connects the semantic, graphic, and possibly other media types of expression together as a multifaceted unit.
+In \symbolist terminology, a \textit{symbol} is an instance of a symbolic representation of data that connects the semantic, graphic, and possibly other media types of expression together as a multifaceted unit.
 Each \textit{symbol} is defined as a \textit{class} of object, which specifies the symbol's data structure and UI interaction, and data mapping to different representational contexts.
 
-\subsection{Semantic Data Format}\label{subsec:format}
+\section{Semantic Data Format}\label{sec:format}
 
 Within the \symbolist application, semantic data is stored as javascript objects, and read/written in JSON format~\cite{crockford2012json}, which is transcoded to and from OSC for inter-application communication.
 
-The main attributes used for \symbolist semantic data objects are:
+The main attributes used in \symbolist semantic data objects are:
 
 \begin{itemize}\itemsep0pt 
 \item \textit{id}: a unique identifier name (required).
@@ -357,7 +373,7 @@ In addition to the required \textit{id} and \textit{class} attributes, symbol ob
     "id" : "foo",
     "class" : "legs",
     "action" : "jump",
-    "startTime" : 0.1
+    "start_time" : 0.1
 }
 \end{lstlisting}
 
@@ -366,9 +382,9 @@ Here we see an object with the \textit{id} ``foo,'' which is of \textit{class} t
 
 \subsection{Containers}
 Symbols may also contain other symbols. 
-Container symbols function to frame their contents, giving reference and context, like a plot graph frame, which provides a perspective for interpreting a set of data points.
+Container symbols function to frame their contents, giving reference and context, like a plot graph frame, which provides a perspective and scaling for interpreting the set of data points displayed in the graph.
 
-When a symbol contains other symbols, the child symbols are stored as an array in the object's \textit{contents} field. For example an imaginary class \textit{timeline}, which holds two types of leg actions, might look like this:
+When a symbol contains other symbols, the child symbols are stored as an array in the object's \textit{contents} field. For example an imaginary class ``timeline'', which holds two types of leg actions, we might write something like:
 
 \begin{lstlisting}[
   mathescape,
@@ -384,21 +400,21 @@ When a symbol contains other symbols, the child symbols are stored as an array i
         "id" : "foo-1",
         "class" : "legs",
         "action" : "jump",
-        "startTime" : 0.1
+        "start_time" : 0.1
     },{
         "id" : "foo-2",
         "class" : "legs",
         "action" : "sit",
-        "startTime" : 0.2
+        "start_time" : 0.2
     }]
 }
 
 \end{lstlisting}
 
 % move this to the definitions discussion?
-In most cases, a symbol's mapping definition will require querying its parent symbol for information, to plot its data relative to the container context, for example offsetting the screen coordinate position based on the parent object position.
+In most cases, a symbol's mapping definition will require querying its parent symbol for information, in order to plot its data relative to the container context, for example offsetting the screen coordinate position based on the parent object position.
 
-\subsection{Score, File Format}\label{json_files}
+\section{Score File Format}\label{sec:score}
 
 Using symbols and symbol containers, we can create tree structures which can be used to represent hierarchical grouping; to represent scores, or other types of data structures.
 At the root of the tree structure is a top-level symbol, which might (but not necessarily) define behavior of its children objects.
@@ -407,6 +423,7 @@ Since the data elements are stored in js objects, it is easy to import/export \s
 When the application loads, it reads a default initialization file, in the form of a \symbolist score.
 The current default initialization config file looks like this:
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[
   mathescape,
   columns=fullflexible,
@@ -454,8 +471,9 @@ The current default initialization config file looks like this:
     }
 }
 \end{lstlisting}
+\end{minipage}
 
-The initialization file is literally a score object file, providing the default context for a given authoring situation. In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbol (which are all actually containers as well, initialized as empty arrays). The \textit{palette} and \textit{tools} attributes tell the application to provide access to certain tools, and child symbols in the GUI (see also section~\ref{editor}).
+The initialization file is literally a score object file, providing the default context for a given authoring situation. In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbol (which are all actually containers as well, initialized as empty arrays). The \textit{palette} and \textit{tools} attributes tell the application to provide access to certain tools, and child symbols in the GUI.
 
 \section{Graphic Display Format}\label{graphic_display_format}
 
@@ -509,11 +527,11 @@ For example, mapping our imaginary ``legs'' actions above, the corresponding SVG
 <g  id="bar" class="timeline symbol" data-duration="1">
   <g class='Timeline display'></g>
   <g class='Timeline contents'>
-      <g  id="foo-1" class="Legs symbol" data-action="jump" data-starttime="0.1">
+      <g  id="foo-1" class="Legs symbol" data-action="jump" data-start_time="0.1">
         <g class='Legs display'></g>
         <g class='Legs contents'></g>
       </g>
-      <g  id="foo-2" class="Legs symbol" data-action="sit" data-starttime="0.2">
+      <g  id="foo-2" class="Legs symbol" data-action="sit" data-start_time="0.2">
         <g class='Legs display'></g>
         <g class='Legs contents'></g>
       </g>
@@ -525,7 +543,7 @@ For example, mapping our imaginary ``legs'' actions above, the corresponding SVG
 
 
 
-\subsection{Performing Data}
+\section{Performing Data}
 
 Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
 
@@ -533,7 +551,7 @@ Just as the \textit{graphic representation} can be seen as a visual expression o
 
 In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
 
-\subsection{Mapping}\label{subsec:mapping}
+\section{Mapping}\label{sec:mapping}
 
 Between each of these representation contexts there is a layer of mapping, with the \textit{semantic data} serving as the primary representation type. 
 
@@ -570,17 +588,16 @@ Note also that the \uicontroller receives and outputs messages always in in the 
 \end{figure}
 
 
-
 \section{Symbol Definitions}\label{library_definitions_api}
 
-Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
+Definition scripts are composed as Javascript modules which are loaded into the program at runtime, which allow for custom graphical user interaction, and define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
 
-Eventually it is planned to provide a set of tools in the GUI for defining a mapping definition graphically but this is not yet implemented.
+Currently definition scripts must be programmed manually; eventually it is planned to provide a set of tools in the GUI for defining a mapping definition graphically, but this is not yet implemented.
 
 There are two types of definition scripts:
 \begin{itemize}\itemsep0pt 
-\item \textit{ui definitions} perform user interactions and mapping between semantic data representation and graphic representation.
-\item \textit{io definitions} are used to assist in the lookup/playback and mapping of the semantic data to media like sound synthesis, video, etc.
+\item \textit{ui definitions} run in the \uicontroller and perform user interactions based on the different interaction modes described above, and apply bidirectional mapping between semantic data representation and graphic representation.
+\item \textit{io definitions} run in the \iocontroller and are used to assist in the lookup and \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
 \end{itemize}
 %Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
@@ -632,6 +649,8 @@ using \drawsocket \textit{key/val} message syntax:
     }
   }
 \end{lstlisting}
+
+
 
 
 
@@ -846,7 +865,7 @@ C/C++ score player, optimized for fast lookup - write to buffer?
 further experiments in representation, spatial audio, eurorack modules, 
 connect with antescofo?
 connect with faust? create audio code via faust, or maybe pd?
-
+networked display via \drawsocket compose on tablets with pen?
 
 \begin{acknowledgments}
 
