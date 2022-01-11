@@ -621,25 +621,21 @@ However, since the \uicontroller and user definition scripts are all being proce
 
 The simplest example of mapping definition is the \textit{semantic to graphic} mapping definition.
 
-the \iocontroller has 
+The \iocontroller has a set of messages that it understands which can be used for a wide range of actions.
+\symbolist uses the \drawsocket \textit{key/val} message syntax, so each OSC bundle should be formatted with a \textit{key} address, which is a keyword flag to signal which routine should interpret the message in the \iocontroller's \textit{io\_receive} function; while the \textit{val} address contains an object (or array of objects) to be processed.
 
-a mechanism for mapping semantic data received from an external application via OSC to symbolic graphic representation; for example by generating scores through algorithmic processes, via textual authoring, via mapping from gestural controller, etc.
+And OSC message with the \textit{data} keyword can be used to add new semantic data objects to the score-model, and create new graphic symbols in the editor from an external process;  for example by generating scores through algorithmic processes, via textual authoring, via mapping from gestural controller, etc.
 
-using \drawsocket \textit{key/val} message syntax:
+Upon receiving an OSC message with a \textit{data} flag, the object attached to the \textit{val} address are added to the model, and then relayed to the \uicontroller.
+In the \uicontroller, the semantic data is mapped to graphic data using the symbol's \textit{class} definition. The class's name provides a mechanism to lookup the class definition in both controller scripts.
 
-\textit{data}: adds a data object to the score, and sends to the ui to be mapped to graphical representation. Parameters include:
-\begin{itemize}\itemsep0pt 
-  \item \textit{class} (required) the class type of the object to create
-  \item \textit{container} (required) the container symbol class to put the object in (in case there are multiple containers that support the same symbol type)
-  \item \textit{id} (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
-  \item Other required or optional parameters will depend on the symbol definition.
-\end{itemize}
+For example, here is an OSC bundle using the \textit{data} key:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
 {
     /key : "data",
     /val : {
-        /class : "fiveLineStaveEvent",
+        /class : "FiveLineStaveEvent",
         /id : "foo"
         /container : "oboe",
         /time : 0.13622,
@@ -649,6 +645,14 @@ using \drawsocket \textit{key/val} message syntax:
     }
   }
 \end{lstlisting}
+
+The \textit{data} key has a few required and optional attributes:
+\begin{itemize}\itemsep0pt 
+  \item \textit{class}: (required) the class type of the object to create.
+  \item \textit{container}: (required) the \textit{id} of the container symbol class to put the object in.
+   \item \textit{id}: (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
+  \item Other required or optional parameters will depend on the symbol definition.
+\end{itemize}
 
 
 
@@ -762,6 +766,7 @@ Using the template, a basic definition might look like this:
 %\end{lstlisting}
 %
 
+\section{UI Callbacks}\label{sec:ui_callbacks}
 
 \section{IO Messages}\label{subsec:io_messages}
 
