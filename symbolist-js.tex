@@ -9,7 +9,10 @@
 \usepackage{ifpdf}
 \usepackage[english]{babel}
 \usepackage{balance}
-\usepackage{listings}
+
+\input{js-code-format}
+\input{json-format}
+%\usepackage{listings}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%% Some useful packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,10 +30,10 @@
 
 
 % REDEFINE THESE VARIABLES:
-\def\papertitle{Symbolist: bidirectional mapping developements}
+\def\papertitle{Symbolist: bidirectional mapping developments}
 \def\firstauthor{Rama Gottfried}
-\def\secondauthor{James Tsz-Him Cheung}
-\def\thirdauthor{Georg Hajdu}
+%\def\secondauthor{James Tsz-Him Cheung}
+%\def\thirdauthor{Georg Hajdu}
 
 \def\copyrightyear{2022}
 
@@ -47,7 +50,7 @@
 
 %% Depending on the number of authors, set this variable accordingly for the copyright notice:
 % \def\copyrightauthors{Author One}
-\def\copyrightauthors{Rama Gottfried, James Cheung and Georg Hajdu}
+\def\copyrightauthors{Rama Gottfried}
 % \def\copyrightauthors{Author One, Author Two et al}
 
 % adds the automatic
@@ -114,13 +117,15 @@
 % ------
 \title{\papertitle}
 
- \threeauthors
-   {\firstauthor} { University for Music and Theater \\ Hamburg, Germany \\
+\oneauthor
+% \threeauthors
+   {\firstauthor} { Hochschule für Music und Theater \\ Hamburg, Germany \\
      {\tt \href{mailto:rama.gottfried@hfmt-hamburg.de}{rama.gottfried@hfmt-hamburg.de}}}
-   {\secondauthor} {University for Music and Theater \\ Hamburg, Germany  \\ 
-     {\tt \href{mailto:tsz.him.cheung@hfmt-hamburg.de}{tsz.him.cheung@hfmt-hamburg.de}}} 
-   {\thirdauthor} {University for Music and Theater \\ Hamburg, Germany \\
-     {\tt \href{mailto:georg.hajdu@hfmt-hamburg.de}{georg.hajdu@hfmt-hamburg.de}}}
+% {\secondauthor} {University for Music and Theater \\ Hamburg, Germany  \\ 
+%   {\tt \href{mailto:tsz.him.cheung@hfmt-hamburg.de}{tsz.him.cheung@hfmt-hamburg.de}}} 
+% {\thirdauthor} {University for Music and Theater \\ Hamburg, Germany \\
+%   {\tt \href{mailto:georg.hajdu@hfmt-hamburg.de}{georg.hajdu@hfmt-hamburg.de}}}
+
 
 
 % ***************************************** the document starts here ***************
@@ -156,13 +161,13 @@ of compositional notation practice.
 
 how much of a background?
 
-In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\cite{world2000scalable}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
+In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\footnote{https://www.w3.org/TR/SVG11/}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
 
 Initially developed as a method for performing vector graphics, 
 SVG-OSC  \cite{gottfried2015svg}
 
 \cite{maccallum2015dynamic} %middleware
-\cite{freed2014io} %io
+%\cite{freed2014io} %io
 
 
 XML nature of SVG makes it easy to parse and map just like and OSC bundle.
@@ -183,7 +188,7 @@ Ircam/ZKM~\cite{gottfried2018symbolist}
 \subsection{JUCE Version}\label{sec:juce_version}
 
 explain juce version (include in overview?)
-MVC~\cite{krasner1988description}
+MVC~\footnote{https://developer.mozilla.org/en-US/docs/Glossary/MVC} %\cite{krasner1988description}
 focused on creating SVG and outputting OSC version (like SVG-OSC approach)
 
 
@@ -351,7 +356,7 @@ Each \textit{symbol} is defined as a \textit{class} of object, which specifies t
 
 \section{Semantic Data Format}\label{sec:format}
 
-Within the \symbolist application, semantic data is stored as javascript objects, and read/written in JSON format~\cite{crockford2012json}, which is transcoded to and from OSC for inter-application communication.
+Within the \symbolist application, semantic data is stored as javascript objects, and read/written in JSON format~\footnote{https://www.json.org/json-en.html}, which is transcoded to and from OSC for inter-application communication.
 
 The main attributes used in \symbolist semantic data objects are:
 
@@ -488,8 +493,8 @@ The \symbolist format for an SVG \textit{symbol} is a one top group ($<$g$>$) el
 
 \begin{lstlisting}[mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
 <g  id="foo" class="SymbolClassName symbol">
-    <g class='SymbolClassName display'></g>
-    <g class='SymbolClassName contents'></g>
+    <g class="SymbolClassName display"></g>
+    <g class="SymbolClassName contents"></g>
 </g>
 \end{lstlisting}
 
@@ -508,9 +513,9 @@ html:
   columns=fullflexible,
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
 ]
-<div class='SymbolClassName symbol'>
-    <div class='SymbolClassName display'></div>
-    <div class='SymbolClassName contents'></div>
+<div class="SymbolClassName symbol">
+    <div class="SymbolClassName display"></div>
+    <div class="SymbolClassName contents"></div>
 </div>
 \end{lstlisting}
 
@@ -523,8 +528,10 @@ The HTML dataset attributes use the prefix ``\textit{data-}''.\footnote{Note tha
 For example, mapping our imaginary ``legs'' actions above, the corresponding SVG objects would be (skipping the actual display drawing for now):
 
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
-<g  id="bar" class="timeline symbol" data-duration="1">
+\begin{lstlisting}[
+%float=*,
+mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
+<g  id="bar" class="Timeline symbol" data-duration="1">
   <g class='Timeline display'></g>
   <g class='Timeline contents'>
       <g  id="foo-1" class="Legs symbol" data-action="jump" data-start_time="0.1">
@@ -590,9 +597,11 @@ Note also that the \uicontroller receives and outputs messages always in in the 
 
 \section{Symbol Definitions}\label{library_definitions_api}
 
-Definition scripts are composed as Javascript modules which are loaded into the program at runtime, which allow for custom graphical user interaction, and define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
+Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
+By creating definition scripts, users are able to form libraries of symbols that can be used together to address a given use-case scenario.
+Scripts allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
 
-Currently definition scripts must be programmed manually; eventually it is planned to provide a set of tools in the GUI for defining a mapping definition graphically, but this is not yet implemented.
+Currently, definition scripts must be programmed directly in JS; but eventually it is planned to provide a UI in the editor for defining a mapping definition graphically, but this is not yet implemented.
 
 There are two types of definition scripts:
 \begin{itemize}\itemsep0pt 
@@ -602,24 +611,12 @@ There are two types of definition scripts:
 %Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
 
-\subsubsection*{io and ui elements}\label{subsec:io_ui_elements}
-
-discuss using DOM elements for hierarchy and js document.querySelector in ui
-and similar options in io using score vs model
-
-
-% internal storage
-The data objects is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
-
-
-maybe this should be renamed ..
-the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
-
-However, since the \uicontroller and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
-
-\subsection{Creating Symbols via OSC}
+% this is an example of using the definitions, let's put it after explaining the definitions system? or use this to peak their interest
+\subsection{Creating Symbols from OSC input}
 
 The simplest example of mapping definition is the \textit{semantic to graphic} mapping definition.
+
+\subsubsection{OSC is received by the \iocontroller}
 
 The \iocontroller has a set of messages that it understands which can be used for a wide range of actions.
 \symbolist uses the \drawsocket \textit{key/val} message syntax, so each OSC bundle should be formatted with a \textit{key} address, which is a keyword flag to signal which routine should interpret the message in the \iocontroller's \textit{io\_receive} function; while the \textit{val} address contains an object (or array of objects) to be processed.
@@ -654,119 +651,82 @@ The \textit{data} key has a few required and optional attributes:
   \item Other required or optional parameters will depend on the symbol definition.
 \end{itemize}
 
+% this is the second part of the process:
+
+\subsubsection{Data to View Mapping in the \uicontroller}
+
+fromData
+
+If an OSC message is received containing data to create a new symbol, the \uicontroller calls the object's `fromData` function, which maps from the data representation to the graphic drawing commands. The `fromData` function should:
+1. send the drawing commands to the browser display (via \drawsocket usually, using the `drawsocketInput` API method). Include the data content into the symbol by using the HTML `dataset` (you can use `ui\_api.dataToHTML(dataObj)` helper function to create the `data-` tags)
+
+\begin{lstlisting}[ language=Javascript]
+    ui_api.drawsocketInput({
+        key: "svg",
+        val: {
+            class: `${className} symbol`,
+            id: uniqueID,
+            parent: container.id,
+            ...newView, 
+            ...ui_api.dataToHTML(dataObj)
+        }
+    }) 
+\end{lstlisting}
+
+\subsection{Creating Data from Graphic Interaction}
+
+To allow for maximum flexibility of interaction in the process of symbol creation, each symbol manages its own mouse interaction upon clicking the corresponding palette button. To simplify this, and other UI interaction, there is a SymbolTemplate which is available to serve as a base class for most use cases. 
+
+ 
+
+createNewFromMouseEvent (template function)
+
+Working from the opposite direction, users can create semantic data entries in the score through graphic interaction. The process for achieving this is a bit more complicated than the 
 
 
+\subsection*{IO and UI data access scope}\label{sec:io_ui_elements}
+
+Referring to the application diagram in figure~\ref{fig:architecture}
+
+discuss using DOM elements for hierarchy and js document.querySelector in ui
+and similar options in io using score vs model
 
 
-\subsection{API Template SymbolBaseClass }\label{sec:template}
+% internal storage
+The data objects is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
 
 
-Using the template, a basic definition might look like this:
+maybe this should be renamed ..
+the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
 
-%
-%
-%\begin{lstlisting}[
-%  mathescape,
-%  columns=fullflexible,
-%  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-%]
-%const Template = require('../lib/SymbolTemplate') 
-%
-%class BasicSymbol extends Template.SymbolBase 
-%{
-%    constructor() {
-%        super();
-%        this.class = "BasicSymbol";
-%    }
-%
-%
-%    get structs () {
-%        return {
-%
-%            data: {
-%                class: this.class,
-%                id : `\${this.class}-0`,
-%                time: 0,
-%                pitch: 55,
-%                duration: 0.1
-%            },
-%            
-%            view: {
-%                class: this.class,
-%                id: `\${this.class}-0`, 
-%                x: 0,
-%                y: 0,
-%                r: 2
-%            }
-%        }
-%    }
-%
-%
-%    display(params) {
-%
-%        ui_api.hasParam(params, Object.keys(this.structs.view) );
-%        
-%        return {
-%            new: "circle",
-%            class: 'notehead',
-%            id: `\${params.id}-notehead`,
-%            cx: params.x,
-%            cy: params.y,
-%            r: params.r
-%        }
-%    }
-%    
-%    getElementViewParams(element) {
-%
-%        const circle = element.querySelector('.notehead');
-%        const x = parseFloat(circle.getAttribute('cx'));
-%        const y = parseFloat(circle.getAttribute('cy'));
-%        const r = parseFloat(circle.getAttribute('r'));
-%
-%        return {
-%            id: element.id,
-%            x,
-%            y,
-%            r
-%        }
-%
-%    }
-%
-%
-%    getPaletteIcon() {
-%        return {
-%            key: "svg",
-%            val: this.display({
-%                id: `circle-palette-icon`,
-%                class: this.class,
-%                x: 10,
-%                y: 10,
-%                r: 2
-%            })
-%        }
-%    }
-%
-%
-%}
-%
-%class BasicSymbol_IO extends Template.IO_SymbolBase
-%{
-%    constructor()
-%    {
-%        super();
-%        this.class = "BasicSymbol";
-%    }
-%    
-%}
-%
-%module.exports = {
-%    ui_def: BasicSymbol,
-%    io_def: BasicSymbol_IO    
-%}
-%\end{lstlisting}
-%
+However, since the \uicontroller and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
 
-\section{UI Callbacks}\label{sec:ui_callbacks}
+\section{UI Definitions}\label{sec:ui_callbacks}
+
+explain:
+
+Semantic Data  -- View Parameters -- Display
+translation system
+
+
+\begin{itemize}\itemsep0pt 
+\item \textit{class} (string) the name of the class
+\item \textit{palette} (array) used for container classes, an array of names of other classes that can be used within this container type.
+\item \textit{getPaletteIcon} ()=> return the icon for display in the palette toolbar
+\item \textit{paletteSelected}: (true/false)=> called when the user clicks on the palette icon for this symbol, used to trigger custom UI for creating new symbols from mouse data. Scripts should define mouse callbacks internally. Generally `cmd-click` is the way to create a new object.
+\item \textit{getInfoDisplay} ()=> return drawing commands for the inspector contextual menu (see `makeDefaultInfoDisplay` below).
+\item \textit{fromData} called from \uicontroller when data is received and needs to be mapped to graphic representation.
+\item \textit{updateFromDataset} called from the inspector, when elements of the data should be updated.
+\item \textit{getContainerForData} for container symbols, this function is called when a new data object is being set, if there are multiple containers of the same type, for example systems with line breaks, this function looks up the container by a certain parameter, usually time.
+\item \textit{childDataToViewParams} mapping function in container symbol called from children to request view parameters from data object.
+\item \textit{childViewParamsToData} mapping function in container symbol called from children to get data mapping from view parameters.
+%__Optional__
+\item \textit{editMode} (element, true/false)=> called from ui controller when entering edit mode
+\item \textit{selected} (element, true/false)=> called from ui controller on selection, return true if selection is handled in the script, false will trigger the default selection mechanics.
+\item \textit{drag} (element, delta\_pos) => called from ui on click drag from a window event listener which works better than a local listener. Return true if handled by the symbol. The `ui\_api.translate` can be used to translate the object using the API function by applying a transform matrix to the top-level group object. 
+\item \textit{applyTransformToData} (optional but usually needed): on mouseup, if selected objects have changed, the ui controller calls `applyTransformToData` which applies the transform matrix to the SVG attribute values. This is important because the attribute values are used for mapping. Inside the `applyTransformToData` function, the `ui\_api.applyTransform` can be used to apply the transform to the SVG data, and then you will want a function like `mapToData` to map the updated graphic information to the data.
+\end{itemize}
+
 
 \section{IO Messages}\label{subsec:io_messages}
 
@@ -781,7 +741,7 @@ For example, here is a \textit{lookup} query to find elements that are returned 
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
 ]
 {
-    /key : "lookup:,
+    /key : "lookup",
     /val : {
         /time : 0.1,
         /id : "trio"
@@ -858,6 +818,109 @@ Note that the system will pass the same call to both definitions, so if both hav
 
 
 
+\subsection{API Template SymbolBaseClass }\label{sec:template}
+
+%
+%Using the template, a basic definition might look like this:
+%
+%\begin{lstlisting}[
+%float=*,
+%language=JavaScript]
+%const Template = require('../lib/SymbolTemplate') 
+%
+%class BasicSymbol extends Template.SymbolBase 
+%{
+%    constructor() {
+%        super();
+%        this.class = "BasicSymbol";
+%    }
+%
+%
+%    get structs () {
+%        return {
+%            data: {
+%                class: this.class,
+%                id : `\${this.class}-0`,
+%                time: 0,
+%                pitch: 55,
+%                duration: 0.1
+%            },
+%            view: {
+%                class: this.class,
+%                id: `\${this.class}-0`, 
+%                x: 0,
+%                y: 0,
+%                r: 2
+%            }
+%        }
+%    }
+%
+%
+%    display(params) {
+%
+%        ui_api.hasParam(params, Object.keys(this.structs.view) );
+%        
+%        return {
+%            new: "circle",
+%            class: 'notehead',
+%            id: `\${params.id}-notehead`,
+%            cx: params.x,
+%            cy: params.y,
+%            r: params.r
+%        }
+%    }
+%    
+%    getElementViewParams(element) {
+%
+%        const circle = element.querySelector('.notehead');
+%        const x = parseFloat(circle.getAttribute('cx'));
+%        const y = parseFloat(circle.getAttribute('cy'));
+%        const r = parseFloat(circle.getAttribute('r'));
+%
+%        return {
+%            id: element.id,
+%            x,
+%            y,
+%            r
+%        }
+%
+%    }
+%
+%
+%    getPaletteIcon() {
+%        return {
+%            key: "svg",
+%            val: this.display({
+%                id: `circle-palette-icon`,
+%                class: this.class,
+%                x: 10,
+%                y: 10,
+%                r: 2
+%            })
+%        }
+%    }
+%
+%
+%}
+%
+%class BasicSymbol_IO extends Template.IO_SymbolBase
+%{
+%    constructor()
+%    {
+%        super();
+%        this.class = "BasicSymbol";
+%    }
+%    
+%}
+%
+%module.exports = {
+%    ui_def: BasicSymbol,
+%    io_def: BasicSymbol_IO    
+%}
+%\end{lstlisting}
+%
+%
+
 \section{Case Study}\label{sec:james_score}
 \input{james_score}
 
@@ -873,7 +936,7 @@ connect with faust? create audio code via faust, or maybe pd?
 networked display via \drawsocket compose on tablets with pen?
 
 \begin{acknowledgments}
-
+thanks james! thanks georg! thanks jean!
 \end{acknowledgments} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

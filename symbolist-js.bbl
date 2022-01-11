@@ -21,13 +21,6 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{world2000scalable}
-\BIBentryALTinterwordspacing
-{World Wide Web Consortium}, ``{Scalable Vector Graphics (SVG) 1.1 (Second
-  Edition)},'' \emph{W3C Candidate Recommendation}, 2011. [Online]. Available:
-  \url{https://www.w3.org/TR/SVG11/}
-\BIBentrySTDinterwordspacing
-
 \bibitem{wright:osc}
 M.~Wright, ``{Open Sound Control: an enabling technology for musical
   networking},'' \emph{Organised Sound}, vol.~10, no.~3, pp. 193--200, 2005.
@@ -44,21 +37,10 @@ J.~MacCallum, R.~Gottfried, I.~Rostovtsev, J.~Bresson, and A.~Freed, ``{Dynamic
   \emph{{Proceedings of the International Computer Music Conference
   (ICMC'15)}}, Denton, TX, USA, 2015.
 
-\bibitem{freed2014io}
-A.~Freed, D.~DeFilippo, R.~Gottfried, J.~MacCallum, J.~Lubow, D.~Razo, and
-  D.~Wessel, ``{o.io: a Unified Communications Framework for Music, Intermedia
-  and Cloud Interaction.}'' in \emph{ICMC}, 2014.
-
 \bibitem{gottfried2018symbolist}
 R.~Gottfried and J.~Bresson, ``Symbolist: An open authoring environment for
   end-user symbolic notation,'' in \emph{International Conference on
   Technologies for Music Notation and Representation (TENOR'18)}, 2018.
-
-\bibitem{krasner1988description}
-G.~E. Krasner, S.~T. Pope \emph{et~al.}, ``{A Description of the
-  Model-View-Controller User Interface Paradigm in the Smalltalk-80 System},''
-  \emph{Journal of object oriented programming}, vol.~1, no.~3, pp. 26--49,
-  1988.
 
 \bibitem{gottfried2019drawsocket}
 R.~Gottfried and G.~Hajdu, ``Drawsocket: A browser based system for networked
@@ -70,9 +52,6 @@ R.~Gottfried and G.~Hajdu, ``Drawsocket: A browser based system for networked
 \bibitem{hajdu2005quintet}
 G.~Hajdu, ``Quintet. net: An environment for composing and performing music on
   the internet,'' \emph{Leonardo}, vol.~38, no.~1, pp. 23--30, 2005.
-
-\bibitem{crockford2012json}
-D.~Crockford, ``Json,'' \emph{ECMA International}, 2012.
 
 \bibitem{guest2014labanotation}
 A.~H. Guest, \emph{Labanotation: The System of Analyzing and Recording
