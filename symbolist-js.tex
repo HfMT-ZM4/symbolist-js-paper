@@ -259,13 +259,14 @@ Max version (node + jweb + Max patch for IPC)
 
 \item A HTTP web-server which serves the editor webpage, and manages messages between the \uicontroller and the \iocontroller via WebSocket connection, as well as handling operating system commands like reading and writing files.
 
-\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket. 
+\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket, and maintains the central \textit{score} database in its semantic data format (described below).
 \end{itemize}
 \end{enumerate}
 
-The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. The \iocontroller can also be used to translate the score into other formats that can be performed by another sequencing tool or program like MaxMSP.
-
-
+%The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. 
+%
+%The \iocontroller can also be used to translate the score into other formats that can be performed by another sequencing tool or program like MaxMSP.
+%
 
 \section{Graphical Authoring and Interaction}\label{sec:editor} %should this be before or after the application structure?
 
@@ -569,7 +570,7 @@ Between each of these representation contexts there is a layer of mapping, with 
 \textit{Semantic data to performance media} mapping (figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).
 
 Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.
-Note also that the \uicontroller receives and outputs messages always in in the \textit{semantic data} format, keeping the concerns of drawing within the browser-side. That said, it is also possible to send \drawsocket messages directly to the UI via the OSC-UDP communication port.
+
 
 % mapping figures
 
@@ -598,20 +599,35 @@ Note also that the \uicontroller receives and outputs messages always in in the 
 \section{Symbol Definitions}\label{library_definitions_api}
 
 Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
-By creating definition scripts, users are able to form libraries of symbols that can be used together to address a given use-case scenario.
-Scripts allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
+Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation to address a given use-case scenario.
+Definitions allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
 
-Currently, definition scripts must be programmed directly in JS; but eventually it is planned to provide a UI in the editor for defining a mapping definition graphically, but this is not yet implemented.
+Currently, definition scripts are programmed directly in JS -- eventually it is planned to provide a UI in the editor for defining a mapping definition graphically, but this is not yet implemented.
 
 There are two types of definition scripts:
 \begin{itemize}\itemsep0pt 
-\item \textit{ui definitions} run in the \uicontroller and perform user interactions based on the different interaction modes described above, and apply bidirectional mapping between semantic data representation and graphic representation.
-\item \textit{io definitions} run in the \iocontroller and are used to assist in the lookup and \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
+\item \textit{ui-definitions} run in the \uicontroller and perform user interactions based on the different interaction modes described above, and apply bidirectional mapping between semantic data representation and graphic representation in the browser.
+\item \textit{io-definitions} run in the \iocontroller and are used to assist in the lookup and \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
 \end{itemize}
+
 %Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
+\subsection*{IO and UI data access scope}\label{sec:io_ui_elements}
 
-% this is an example of using the definitions, let's put it after explaining the definitions system? or use this to peak their interest
+Since the \textit{ui} and \textit{io} controllers are run in separate processes\footnote{and potentially separate devices.} (figure~\ref{fig:architecture}), there is no direct access to data stored in the other location. In other words, the \iocontroller does not have direct access to the symbol's drawing information, and the \uicontroller does not have direct access to the score or UDP port for sending OSC message.
+
+Loosely following the MVC pattern, the concerns of drawing are kept within the browser-side \uicontroller, with all messages between the \textit{ui} and \textit{io} processes are in \drawsocket JSON format, with all symbol data expressed in its \textit{semantic} form.
+Meanwhile the \iocontroller manages the \textit{score} and handles external OSC communication, relaying messages to the \uicontroller as needed.
+
+As mentioned above, the graphic representation takes advantage of the HTML dataset feature, which provides quick access to semantic data for ui-definitions, stored in the top level SVG $<$g$>$ or HTML $<$div$>$ elements. 
+And so, since ui-definitions are running in a browser window, they are able to make use of the standard HTML DOM tree JS methods for fast querying of elements in the graphic version of the score\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Document} (i.e. querySelector, getElementById, etc.).
+
+To provide similar data query access on the server-side, the score data is stored in two JS objects, the \textit{score} which stores the semantic data in a hierarchical tree structure, and a JS Map object named \textit{model} which is a flat lookup table by unique id, with links to object references to the coordinated object in the score tree.
+
+Since the ui and io symbol definitions run in parallel they need to keep the other side up to date in case of any alteration to the score data. 
+Updates sent from the \iocontroller to the UI can be as simple as sending a new score which will trigger a redrawing of the graphics in the UI view. 
+Updates from graphic user interaction require mapping from the graphic to semantic representation, which is handled in the browser. Any changes are sent back to the \iocontroller where the new semantic values are updated in the \textit{model} (which automatically update the \textit{score}, since both objects hold JS references to the same JS objects).
+
 \subsection{Creating Symbols from OSC input}
 
 The simplest example of mapping definition is the \textit{semantic to graphic} mapping definition.
@@ -683,23 +699,6 @@ createNewFromMouseEvent (template function)
 
 Working from the opposite direction, users can create semantic data entries in the score through graphic interaction. The process for achieving this is a bit more complicated than the 
 
-
-\subsection*{IO and UI data access scope}\label{sec:io_ui_elements}
-
-Referring to the application diagram in figure~\ref{fig:architecture}
-
-discuss using DOM elements for hierarchy and js document.querySelector in ui
-and similar options in io using score vs model
-
-
-% internal storage
-The data objects is stored in a \textit{model} or \textit{score} which is made up of a hierarchical arrangement of objects called \textit{symbols}.
-
-
-maybe this should be renamed ..
-the main point here is the content aka symbol, which is represented in different ways in different contexts, ui/io aka semantic and graphic versions.
-
-However, since the \uicontroller and user definition scripts are all being processed in the browser, scripts are free to use traditional JS approaches to manipulating the browser DOM.
 
 \section{UI Definitions}\label{sec:ui_callbacks}
 
