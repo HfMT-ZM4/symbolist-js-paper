@@ -698,24 +698,36 @@ Similarly, when the graphic object is moved, the child object will call the pare
 Variables and methods called by the \iocontroller are:
 
 \begin{itemize}\itemsep0pt 
-\item \textit{class} (string)  class name, corresponding to class name in UI Definition.
-\item \textit{comparator} (a,b)=$>$ comparator function to use to sort this symbol type, return -1, 0, or 1
-\item \textit{lookup} (params, obj\_ref) =$>$ hit detection function called when looking up from query point, returns information to send back to caller. `params` are user parameters included in the lookup query, `obj\_ref` is the instance of this class type. When the `lookup` key is received by the `io controller`, the system looks up the element by its `id`, generally the id will be of a container object. Then it is up to the container object's `lookup` function to iterate its child objects and accumulate them into an output array to send back to the calling application.
+\item \textit{class}: class name, corresponding to class name in UI Definition.
+
+\item \textit{comparator}: comparator function used in container symbols to sort child symbol. For example, if a given container uses a \textit{time} value for sorting, when a new child node is added, the comparator function helps the container insert the child element at the correct location in the \textit{contents} array.
+
+\item \textit{lookup}: called via OSC (using the \drawsocket syntax \textit{key} ``lookup'') to look up events at a given value specified by the container (e.g. typically \textit{time}). The \textit{lookup} function performs hit detection collecting all active elements at that query point, output back to the calling application via OSC (the in/out UDP port information is set in the \symbolist configuration file). By default the output is an array of all active data objects at the lookup point, along with the relative phase position within each element, useful for controlling amplitude envelopes etc. (See Figure~\ref{fig:score-lookup}).
+
+\item \textit{getFormattedLookup}: called via OSC to request a complete list of events for external sequencing, formatted in the symbol definition to apply to the external syntax requirements.
+%For example, this function might return a list of \textit{/x} and \textit{/y} values for use with the \textit{o.lookup$\sim$} Max object, or create a MIDI file export etc.
+% references for o.lookup? or maybe take this out, too specific
+
 \end{itemize}
 
+Note that all parameters included in the input \drawsocket syntax \textit{val} object will be included in the data received by \textit{lookup} and \textit{getFormattedLookup} as a parameters, and can then be used when performing the lookup, for example to perform multidimensional nearest neighbor lookup, etc.
 
 \subsection{Custom User Methods}\label{sec:call}
 
-Users may also create their own methods and call them 
+Users may also create their own methods in either ui or io-definitions and call them from outside processes over OSC, using the ``call'' keyword.
+\symbolist will pass the same call request to both definitions, so if both have a function of the same name they will both be called. 
+%Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
+
+Required parameters:
 
 \begin{itemize}\itemsep0pt 
-\item \textit{call}: calls a function in the one or both of the class definitions. All of the parameters in the \textit{val} object will be passed to the function as an argument. Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
-\begin{itemize}\itemsep0pt 
-  \item \textit{class} (required) class of the object to call
-  \item \textit{method} (required) name of object function to call
+ \item \textit{class}: name of the class to lookup.
+  \item \textit{method} name of class method to call.
 \end{itemize}
 
-\end{itemize}
+All of the parameters in the \textit{val} object will be passed to the function as an argument. 
+
+User class methods can be used to apply operations to the score or ui, for example transposing all pitches on the ``Staff'' named ``oboe'' might look like this:
 
 \begin{lstlisting}[
   mathescape,
@@ -725,22 +737,15 @@ Users may also create their own methods and call them
 {
     /key : "call",
     /val : {
-        /function : "functionName",
-        /class : "className",
-        /id : "foo"
-        /someValue : 1,
-        /anotherValue : 2
+        /class : "Staff",
+        /method : "transpose",
+        /id : "oboe"
+        /steps : 12
     }
 }
 \end{lstlisting}
 
-Note that the system will pass the same call to both definitions, so if both have a function of the same name they will both be called.
-* \textit{drawsocket}: forwards \drawsocket format messages directly to \drawsocket, bypassing the symbolist mapping.
-
-
-
-
-
+The implementation in the io definition could then lookup the class ``Staff'' and call the method ``transpose'', passing the entire \textit{val} object to the function as an argument. The ``transpose'' function would then lookup the ``oboe'' staff in the model, and then iterate all of its contents, offsetting the ``note'' values by the number of steps specified in the method arguments.
 
 \section{Symbol Definition Functional Examples}
 
