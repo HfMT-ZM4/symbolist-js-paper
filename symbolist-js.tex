@@ -45,8 +45,8 @@
 \def\iocontroller{\textit{io\_controller}\xspace}
 \def\uiapiFunction{\textit{ui\_api}}
 \def\uiapi{\textit{ui\_api}\xspace}
-\def\ioapiFunction{\textit{io\_ap}}
-\def\ioapi{\textit{io\_ap}\xspace}
+\def\ioapiFunction{\textit{io\_api}}
+\def\ioapi{\textit{io\_api}\xspace}
 \makeatletter
 \newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
 \makeatother
@@ -525,7 +525,7 @@ html:
 \end{lstlisting}
 
 
-\subsection{dataset-elements}
+\subsection{dataset-elements}\label{sec:dataset}
 
 Since \symbolist is constantly mapping to and from semantic data and its graphic representation, we are using the HTML \textit{dataset} feature\footnote{https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset} to store the semantic data inside the top-level \textit{symbol} element ($<$g$>$ or $<$div$>$).
 The HTML dataset attributes use the prefix ``\textit{data-}''.\footnote{Note that according to the HTML dataset specifications, all names will be converted to lowercase, this can create issues in some cases, so best practice is to use all lowercase for attribute names.}
@@ -599,20 +599,24 @@ Note that in \symbolist mapping between \textit{performance media} and \textit{g
 \label{fig:score-lookup}}
 \end{figure}
 
-
 \section{Symbol Definitions}\label{library_definitions_api}
+%Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
 
-Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
+Symbols are defined as Javascript classes which are stored and recalled when symbol actions are performed. 
 Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation to address a given use-case scenario.
-Definitions allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
+Definitions define the mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
+%Definitions allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
 
-Currently, definition scripts are programmed directly in JS -- eventually it is planned to provide a UI in the editor for defining a mapping definition graphically, but this is not yet implemented.
+To allow for maximum flexibility of interaction and the creation of context-specific composition environments, each symbol manages its own mouse interaction, triggered by the user's selection in the palette toolbar. 
+In order to streamline the process of writing new symbol definitions there is a template base class that handles most common interaction situations, which can be redefined and overwritten by sub-classes. Eventually it is planned to provide a UI in the editor for defining a mapping definition graphically, but this is not yet implemented.
 
 There are two types of definition scripts:
 \begin{itemize}\itemsep0pt 
 \item \textit{ui-definitions} run in the \uicontroller and perform user interactions based on the different interaction modes described above, and apply bidirectional mapping between semantic data representation and graphic representation in the browser.
 \item \textit{io-definitions} run in the \iocontroller and are used to assist in the lookup and \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
 \end{itemize}
+
+In each controller context there are certain methods and variables that need to be defined in order for the class to function properly in the \symbolist ecosystem.
 
 %Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
@@ -623,43 +627,20 @@ Since the \textit{ui} and \textit{io} controllers are run in separate processes\
 Loosely following the MVC pattern,\footnote{https://developer.mozilla.org/en-US/docs/Glossary/MVC} the concerns of drawing are kept within the browser-side \uicontroller, with all messages between the \textit{ui} and \textit{io} processes are in \drawsocket JSON format, with all symbol data expressed in its \textit{semantic} form.
 Meanwhile the \iocontroller manages the \textit{score} and handles external OSC communication, relaying messages to the \uicontroller as needed.
 
-As mentioned above, the graphic representation takes advantage of the HTML dataset feature, which provides quick access to semantic data for ui-definitions, stored in the top level SVG $<$g$>$ or HTML $<$div$>$ elements. 
-And so, since ui-definitions are running in a browser window, they are able to make use of the standard HTML DOM tree JS methods for fast querying of elements in the graphic version of the score\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Document} (i.e. querySelector, getElementById, etc.).
+As discussed above, the graphic representation takes advantage of the HTML dataset feature, which provides a mechanism for storing the semantic data inside the graphic context (see section~\ref{sec:dataset}).
+Since ui-definitions are running in a web-browser, they are able to make use of the standard HTML-DOM JS methods for fast querying of elements (i.e. querySelector, getElementById, etc.)\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Document} to retrieve graphic as well as semantic data stored in the display hierarchy.
 
-To provide similar data query access on the server-side, the score data is stored in two JS objects, the \textit{score} which stores the semantic data in a hierarchical tree structure, and a JS Map object named \textit{model} which is a flat lookup table by unique id, with links to object references to the coordinated object in the score tree.
+To provide similar data query access in the \iocontroller, the score data is stored in two JS objects: the \textit{score}, which stores the semantic data in a hierarchical tree structure, and a object named \textit{model}, which is a flat lookup table by unique id, with links to object references to the coordinated object in the score tree.
 
-Since the ui- and io-definitions run in parallel they need to keep the other side updated in case of any alteration to the score data. 
+Since the ui- and io-controllers run in parallel they need to keep the other side updated in case of any alteration to the score data. 
 Updates sent from the \iocontroller to the UI can be as simple as sending a new score which will trigger a redrawing of the graphics in the UI view. 
 Updates from graphic user interaction require mapping from the graphic to semantic representation, which is handled in the browser. Any changes are sent back to the \iocontroller where the new semantic values are updated in the \textit{model} (which automatically update the \textit{score}, since both objects hold JS references to the same JS objects).
 
-\section{Symbol Definition Class Structure}
-Symbols are defined as JS classes which are stored and recalled when symbol actions are to be performed. In each controller context (ui or io) there are certain required methods and variables that are expected in order for the class to function properly in the \symbolist ecosystem.
+\subsection*{API Functions}\label{sec:api_functions}
 
-Since the 
-To allow for maximum flexibility of interaction in the process of symbol creation, each symbol manages its own mouse interaction upon clicking the corresponding palette button. To simplify this, and other UI interaction, there is a SymbolTemplate which is available to serve as a base class for most use cases. 
-
-
-\subsection{API Template SymbolBaseClass }\label{sec:template}
-\uiapi
-\ioapi
+In each controller context, there are a set of helper functions for use by symbol definitions stored in global objects called \uiapi and \ioapi, which provide many essential operations.
 
 \subsection{UI Definitions}\label{sec:ui_callbacks}
-
-explain:
-
-Semantic Data  -- View Parameters -- Display
-translation system
-
-In the template class data to graphic mapping is handled in two internal methods:
-
-viewParamsToData
-dataToViewParams
-\textit{childDataToViewParams} mapping function in container symbol called from children to request view parameters from data object.
-
-\textit{childViewParamsToData} mapping function in container symbol called from children to get data mapping from view parameters.
-
-
-
 
 Variables and methods called by the \uicontroller are:
 
@@ -671,31 +652,93 @@ Variables and methods called by the \uicontroller are:
 
 \item \textit{paletteSelected}: called when the user clicks on the palette icon for this symbol, used to trigger custom UI. When the symbol is selected in the palette, the definition should enable its mouse handers. For creating new symbols from mouse data (currently \textit{cmd-click} is the convention).
 
-\item \textit{getInfoDisplay}: called when creating the inspector window; returns drawing commands for the inspector contextual menu, for convenience there is a makeDefaultInfoDisplay in the \uiapi which can be used for most cases.
+\item \textit{getInfoDisplay}: called when creating the inspector window; returns drawing commands for the inspector contextual menu, for convenience \uiapi provides a function called \textit{makeDefaultInfoDisplay} which can be used in most cases.
 
-\item \textit{fromData} called when data is should be mapped to graphic representation. The definition is responsible for creating the graphic element, normally via \drawsocket, but other approaches are also possible.
+\item \textit{fromData}: called when data is should be mapped to graphic representation. The definition is responsible for creating the graphic element, normally via \drawsocket, but other approaches are also possible.
 
-\item \textit{updateFromDataset} called from the inspector when elements of the data should be updated. Usually this function will call \textit{fromData} to redraw the graphic symbol, and should also send the updated data to the server.
+\item \textit{updateFromDataset}: called from the inspector when elements of the data should be updated. Usually this function will call \textit{fromData} to redraw the graphic symbol, and should also send the updated data to the server.
 
-\item \textit{selected} called on selection and deselection, return true if selection is handled in the script, returning false (or no return) will trigger the default selection mechanics by the \uicontroller.
+\item \textit{selected}: called on selection and deselection, return true if selection is handled in the script, returning false (or no return) will trigger the default selection mechanics by the \uicontroller.
 
-\item \textit{drag} called from \uicontroller when the user drags selected symbols. For best results, the use the \uiapi \textit{translate} function to set the symbol's SVG translation matrix, but do not apply the translation until mouse up to avoid incremental state changes to score.
+\item \textit{drag}: called from \uicontroller when the user drags selected symbols. For best results, the use the \uiapi \textit{translate} function to set the symbol's SVG translation matrix, but do not apply the translation until mouse up to avoid incremental state changes to score.
 
 \item \textit{applyTransformToData}: called on mouse-up if selected objects have changed. Definition should then apply the transform matrix to the SVG attribute values. This is important because the attribute values not the translation matrix are used for mapping. The \uiapi helper function \textit{.applyTransform} is provided for convenience.
 
 \item \textit{currentContext}: called when the user enters or exits a container symbol (hitting the [s] key, [esc] to exit).
 
-\item \textit{editMode} called when entering and exiting edit mode.
+\item \textit{editMode}: called when entering and exiting edit mode.
 \end{itemize}
 
-\section{IO Definitions}\label{subsec:io_messages}
+\subsubsection{Data and View Parameters}
 
+Probably the most important elements of the symbol definition is the bi-directional mapping between semantic and graphic forms. 
+Looking at Figures~\ref{fig:data-to-graphic} and \ref{fig:graphic-to-data} we can see that in some cases the relationship between a semantic property and its graphic representation is not a one-to-one mapping.
+For instance in Figure~\ref{fig:data-to-graphic} the \textit{note} property needs to be mapped to a pixel position that is used for both the center point of a graphic circle (note-head) as well as the starting point for a line (duration indication).
+In reverse, Figure~\ref{fig:graphic-to-data} shows how when the user moves a symbol graphically, the new pixel positions need to be translated back into semantic data in order to update the score.
+This can get somewhat complex in cases of nonlinear mappings, and one-to-many data to graphic situations.
+
+In order to manage the mapping between semantic and display representation, the template base class uses an intermediate mapping stage called \textit{view-parameters}.
+The idea is that the \textit{view-parameter} stage contains the bare-minimum number of variables needed to draw the symbol.
+For example, in Figure~\ref{fig:data-to-graphic} the graphic representation requires a \textit{y} position relative to the pitch, an \textit{x} position relative to the start time, and a \textit{width} value relative to the duration of the event (the amplitude is not displayed).
+After first mapping from the semantic attributes \textit{note}, \textit{start-time} and \textit{duration} to view-parameters \textit{x}, \textit{y}, and \textit{width}, the drawing method can then use the \textit{x}, \textit{y}, and \textit{width} values to draw its two graphic objects from the reduced set of view-parameters values.
+
+The ui template class uses two functions to define data-view mappings: \textit{dataToViewParams} which receives the semantic data object and returns the view-parameter object, and \textit{viewParamsToData} which performs the opposite mapping.
+Note that in many cases the \textit{viewParamsToData} function needs only one aspect of the graphic to map back to semantic data. In the example shown in Figure~\ref{fig:graphic-to-data}, the mapping only really needs either the center point of the note-head or the start-x position of the line to determine the \textit{start-time} parameter.
+
+The template class also two additional data/view-parameter methods to coordinate child objects with parent containers: \textit{childDataToViewParams} and \textit{childViewParamsToData}.
+For example, in Figures~\ref{fig:data-to-graphic} a note-head circle is drawn from its \textit{note} parameter, in coordination with a five-line staff.
+Like a plot graph, the \textit{staff} is a container symbol which defines how we interpret the elements written on its lines. 
+In this case, the symbol definition for the \textit{staff} has a \textit{childDataToViewParams} function is called by the action of the child symbol. 
+The \textit{childDataToViewParams} receives the child data object, as well as the graphic element of a particular staff (which was selected by the user pressing the [s] key). Given its placement on the screen and its own data parameters (number of lines, clef, etc.) the staff's \textit{childDataToViewParams} function will return the view parameters for the child, mapped in relationship to the container object.
+Similarly, when the graphic object is moved, the child object will call the parent's \textit{childViewParamsToData} function to assist with mapping back to semantic data format.
+
+
+\subsection{IO Definitions}\label{sec:io_messages}
+
+Variables and methods called by the \iocontroller are:
 
 \begin{itemize}\itemsep0pt 
 \item \textit{class} (string)  class name, corresponding to class name in UI Definition.
 \item \textit{comparator} (a,b)=$>$ comparator function to use to sort this symbol type, return -1, 0, or 1
 \item \textit{lookup} (params, obj\_ref) =$>$ hit detection function called when looking up from query point, returns information to send back to caller. `params` are user parameters included in the lookup query, `obj\_ref` is the instance of this class type. When the `lookup` key is received by the `io controller`, the system looks up the element by its `id`, generally the id will be of a container object. Then it is up to the container object's `lookup` function to iterate its child objects and accumulate them into an output array to send back to the calling application.
 \end{itemize}
+
+
+\subsection{Custom User Methods}\label{sec:call}
+
+Users may also create their own methods and call them 
+
+\begin{itemize}\itemsep0pt 
+\item \textit{call}: calls a function in the one or both of the class definitions. All of the parameters in the \textit{val} object will be passed to the function as an argument. Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
+\begin{itemize}\itemsep0pt 
+  \item \textit{class} (required) class of the object to call
+  \item \textit{method} (required) name of object function to call
+\end{itemize}
+
+\end{itemize}
+
+\begin{lstlisting}[
+  mathescape,
+  columns=fullflexible,
+  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
+]
+{
+    /key : "call",
+    /val : {
+        /function : "functionName",
+        /class : "className",
+        /id : "foo"
+        /someValue : 1,
+        /anotherValue : 2
+    }
+}
+\end{lstlisting}
+
+Note that the system will pass the same call to both definitions, so if both have a function of the same name they will both be called.
+* \textit{drawsocket}: forwards \drawsocket format messages directly to \drawsocket, bypassing the symbolist mapping.
+
+
+
 
 
 
