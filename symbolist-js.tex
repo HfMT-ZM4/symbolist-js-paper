@@ -208,6 +208,8 @@ a lot of mapping is still needed
 % drawsocket
 \subsection{Drawsocket}\label{sec:drawsocket}
 
+
+mention that in addition to the front end that the drawsocket message format
 \cite{gottfried2019drawsocket}
 \cite{hajdu2005quintet}
 
@@ -263,9 +265,12 @@ Max version (node + jweb + Max patch for IPC)
 
 \item A HTTP web-server which serves the editor webpage, and manages messages between the \uicontroller and the \iocontroller via WebSocket connection, as well as handling operating system commands like reading and writing files.
 
-\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket, and maintains the central \textit{score} database in its semantic data format (described below).
+\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket which can be used for a wide range of actions. The \iocontroller additionally maintains the central \textit{score} database in its semantic data format (described below).
 \end{itemize}
 \end{enumerate}
+
+\subsubsection{Interprocess messaging syntax} 
+\symbolist uses a \textit{key/val} message syntax for OSC and JSON interprocess communication developed in \drawsocket (discussed further in sections~\ref{sec:user_methods} and \ref{sec:osc_input}), where a \textit{key} address is used a keyword to signal which routine should interpret the message, and the \textit{val} address contains an object (or array of objects) to be processes.
 
 %The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. 
 %
@@ -533,19 +538,19 @@ The HTML dataset attributes use the prefix ``\textit{data-}''.\footnote{Note tha
 For example, mapping our imaginary ``legs'' actions above, the corresponding SVG objects would be (skipping the actual display drawing for now):
 
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[
+\begin{lstlisting}[language=Javascript,
 %float=*,
 mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
 <g  id="bar" class="Timeline symbol" data-duration="1">
-  <g class='Timeline display'></g>
-  <g class='Timeline contents'>
+  <g class="Timeline display"></g>
+  <g class="Timeline contents">
       <g  id="foo-1" class="Legs symbol" data-action="jump" data-start_time="0.1">
-        <g class='Legs display'></g>
-        <g class='Legs contents'></g>
+        <g class="Legs display"></g>
+        <g class="Legs contents"></g>
       </g>
       <g  id="foo-2" class="Legs symbol" data-action="sit" data-start_time="0.2">
-        <g class='Legs display'></g>
-        <g class='Legs contents'></g>
+        <g class="Legs display"></g>
+        <g class="Legs contents"></g>
       </g>
     </g>
 </g>
@@ -603,8 +608,9 @@ Note that in \symbolist mapping between \textit{performance media} and \textit{g
 %Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
 
 Symbols are defined as Javascript classes which are stored and recalled when symbol actions are performed. 
-Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation to address a given use-case scenario.
+For each user interaction, the ui- and io-controllers looks up the symbols involved in the interaction, and uses their definitions to enact the symbol's reaction. 
 Definitions define the mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
+Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation structure needed to address a given use-case scenario.
 %Definitions allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
 
 To allow for maximum flexibility of interaction and the creation of context-specific composition environments, each symbol manages its own mouse interaction, triggered by the user's selection in the palette toolbar. 
@@ -640,13 +646,14 @@ Updates from graphic user interaction require mapping from the graphic to semant
 
 In each controller context, there are a set of helper functions for use by symbol definitions stored in global objects called \uiapi and \ioapi, which provide many essential operations.
 
-\subsection{UI Definitions}\label{sec:ui_callbacks}
+\section{UI Definitions}\label{sec:ui_callbacks}
 
-Variables and methods called by the \uicontroller are:
+At the time of writing, the variables and methods defined in the symbol class referred to by the \uicontroller are:
 
 \begin{itemize}\itemsep0pt 
-\item \textit{class}: the unique name of the symbol.
-\item \textit{palette}: used for container symbols, an array of class names of other symbols that can be used within this container.
+\item \textit{class}: the unique name of the symbol, used to store and lookup the symbol definition in the \uicontroller.
+
+\item \textit{palette}: in the case of container symbols, an array of class names of other symbols that can be used within this container, which are drawn in the palette toolbar when the user selects a symbol as a new context.
 
 \item \textit{getPaletteIcon}: called when drawing the palette for a given container; returns an icon for display in the palette toolbar, using \drawsocket format.
 
@@ -662,30 +669,32 @@ Variables and methods called by the \uicontroller are:
 
 \item \textit{drag}: called from \uicontroller when the user drags selected symbols. For best results, the use the \uiapi \textit{translate} function to set the symbol's SVG translation matrix, but do not apply the translation until mouse up to avoid incremental state changes to score.
 
-\item \textit{applyTransformToData}: called on mouse-up if selected objects have changed. Definition should then apply the transform matrix to the SVG attribute values. This is important because the attribute values not the translation matrix are used for mapping. The \uiapi helper function \textit{.applyTransform} is provided for convenience.
+\item \textit{applyTransformToData}: called on mouse-up if selected objects have changed. Definition should then apply the transform matrix to the SVG attribute values. This is important because the attribute values not the translation matrix are used for mapping. The \uiapi helper function \textit{applyTransform} is provided for convenience.
 
 \item \textit{currentContext}: called when the user enters or exits a container symbol (hitting the [s] key, [esc] to exit).
 
 \item \textit{editMode}: called when entering and exiting edit mode.
 \end{itemize}
 
-\subsubsection{Data and View Parameters}
+\subsection{Data and View Parameters}\label{sec:view-parameters}
 
-Probably the most important elements of the symbol definition is the bi-directional mapping between semantic and graphic forms. 
+Probably the most important elements of the symbol definition is the bi-directional mapping between semantic and graphic forms.
+ 
 Looking at Figures~\ref{fig:data-to-graphic} and \ref{fig:graphic-to-data} we can see that in some cases the relationship between a semantic property and its graphic representation is not a one-to-one mapping.
 For instance in Figure~\ref{fig:data-to-graphic} the \textit{note} property needs to be mapped to a pixel position that is used for both the center point of a graphic circle (note-head) as well as the starting point for a line (duration indication).
 In reverse, Figure~\ref{fig:graphic-to-data} shows how when the user moves a symbol graphically, the new pixel positions need to be translated back into semantic data in order to update the score.
-This can get somewhat complex in cases of nonlinear mappings, and one-to-many data to graphic situations.
+This can get somewhat complex in cases of nonlinear mappings and hierarchical data structures.
 
 In order to manage the mapping between semantic and display representation, the template base class uses an intermediate mapping stage called \textit{view-parameters}.
 The idea is that the \textit{view-parameter} stage contains the bare-minimum number of variables needed to draw the symbol.
+
 For example, in Figure~\ref{fig:data-to-graphic} the graphic representation requires a \textit{y} position relative to the pitch, an \textit{x} position relative to the start time, and a \textit{width} value relative to the duration of the event (the amplitude is not displayed).
 After first mapping from the semantic attributes \textit{note}, \textit{start-time} and \textit{duration} to view-parameters \textit{x}, \textit{y}, and \textit{width}, the drawing method can then use the \textit{x}, \textit{y}, and \textit{width} values to draw its two graphic objects from the reduced set of view-parameters values.
 
 The ui template class uses two functions to define data-view mappings: \textit{dataToViewParams} which receives the semantic data object and returns the view-parameter object, and \textit{viewParamsToData} which performs the opposite mapping.
 Note that in many cases the \textit{viewParamsToData} function needs only one aspect of the graphic to map back to semantic data. In the example shown in Figure~\ref{fig:graphic-to-data}, the mapping only really needs either the center point of the note-head or the start-x position of the line to determine the \textit{start-time} parameter.
 
-The template class also two additional data/view-parameter methods to coordinate child objects with parent containers: \textit{childDataToViewParams} and \textit{childViewParamsToData}.
+The template class also two additional data/view parameter translation methods to coordinate child objects with parent containers: \textit{childDataToViewParams} and \textit{childViewParamsToData}.
 For example, in Figures~\ref{fig:data-to-graphic} a note-head circle is drawn from its \textit{note} parameter, in coordination with a five-line staff.
 Like a plot graph, the \textit{staff} is a container symbol which defines how we interpret the elements written on its lines. 
 In this case, the symbol definition for the \textit{staff} has a \textit{childDataToViewParams} function is called by the action of the child symbol. 
@@ -693,14 +702,15 @@ The \textit{childDataToViewParams} receives the child data object, as well as th
 Similarly, when the graphic object is moved, the child object will call the parent's \textit{childViewParamsToData} function to assist with mapping back to semantic data format.
 
 
-\subsection{IO Definitions}\label{sec:io_messages}
+\section{IO Definitions}\label{sec:io_definitions}
 
-Variables and methods called by the \iocontroller are:
+At the time of writing, the \iocontroller has a much simpler function, which is to handle OSC messages from external applications, score data maintenance, file reading and writing, and responding to external score lookup queries for sequencing.
+Variables and methods currently used by the \iocontroller are:
 
 \begin{itemize}\itemsep0pt 
-\item \textit{class}: class name, corresponding to class name in UI Definition.
+\item \textit{class}: class name, corresponding to class name in UI Definition, used to store and lookup the symbol definition.
 
-\item \textit{comparator}: comparator function used in container symbols to sort child symbol. For example, if a given container uses a \textit{time} value for sorting, when a new child node is added, the comparator function helps the container insert the child element at the correct location in the \textit{contents} array.
+\item \textit{comparator}: a comparator function used in container symbols to sort child symbol. For example, if a given container uses a \textit{time} value for sorting, when a new child node is added, the comparator function helps the container insert the child element at the correct location in the \textit{contents} array. This assists to increase the efficiency of looking up events occurring at a given time (or other data sequencing parameter).
 
 \item \textit{lookup}: called via OSC (using the \drawsocket syntax \textit{key} ``lookup'') to look up events at a given value specified by the container (e.g. typically \textit{time}). The \textit{lookup} function performs hit detection collecting all active elements at that query point, output back to the calling application via OSC (the in/out UDP port information is set in the \symbolist configuration file). By default the output is an array of all active data objects at the lookup point, along with the relative phase position within each element, useful for controlling amplitude envelopes etc. (See Figure~\ref{fig:score-lookup}).
 
@@ -710,15 +720,75 @@ Variables and methods called by the \iocontroller are:
 
 \end{itemize}
 
-Note that all parameters included in the input \drawsocket syntax \textit{val} object will be included in the data received by \textit{lookup} and \textit{getFormattedLookup} as a parameters, and can then be used when performing the lookup, for example to perform multidimensional nearest neighbor lookup, etc.
+Note that the \textit{lookup} and \textit{getFormattedLookup} methods are able to view the whole OSC bundle that is sent in, and have access to the entire score data model, and so it is also possible to define multiple ways of looking up (and performing) the score data at the same time; or example multidimensional nearest neighbor lookup, or polytemporal sequencing, etc.
 
-\subsection{Custom User Methods}\label{sec:call}
+%all parameters included in the input \drawsocket syntax \textit{val} object will be included in the data received by \textit{lookup} and \textit{getFormattedLookup} as a parameters, and can then be used when performing the lookup, for example to perform multidimensional nearest neighbor lookup, etc.
+\section{Creating Symbols from OSC input}\label{sec:osc_input}
 
-Users may also create their own methods in either ui or io-definitions and call them from outside processes over OSC, using the ``call'' keyword.
-\symbolist will pass the same call request to both definitions, so if both have a function of the same name they will both be called. 
-%Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
+As an illustration of how data is processed through the \symbolist architecture, we can follow the sequence of actions taken in the case of \textit{semantic to graphic} mapping; for example when algorithmically generating score data, using an outside process to create the data and sending it to \symbolist via OSC, using the \drawsocket key/val syntax.
 
-Required parameters:
+\subsubsection*{Data input via OSC}
+The \iocontroller has a small collection of built-in processes that can be called via OSC, the most important of which is the function to add new data elements to the score and graphic display, accessible using the \textit{data} keyword.
+
+For example, here is an OSC bundle using the \textit{data} key:
+\begin{lstlisting}[  language=Javascript, mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
+{
+    /key : "data",
+    /val : {
+        /class : "FiveLineStaveEvent",
+        /id : "foo"
+        /container : "oboe",
+        /time : 0.13622,
+        /ratio : "7/4",
+        /duration : 0.1,
+        /amp : 1
+    }
+  }
+\end{lstlisting}
+
+The ``data'' keyword message has the following required and optional attributes:
+\begin{itemize}\itemsep0pt 
+  \item \textit{class}: the class name of the object to create (required) .
+  \item \textit{container}: the \textit{id} of the container symbol class to put the object in (required).
+   \item \textit{id}: a unique id to use for the data object (optional); if not specified a unique string will be generated .
+  \item Other required or optional parameters will depend on the symbol definition.
+\end{itemize}
+
+Upon receiving an OSC message with the \textit{key} ``data'', the object payload stored by \textit{val} is added to the model, and then relayed to the \uicontroller.
+
+% this is the second part of the process:
+
+\subsubsection*{Data to View Mapping in the \uicontroller}
+
+Received by the \uicontroller, the semantic data then is mapped to graphic data, by looking up the symbol's \textit{class} definition and calling the ui-definition's \textit{fromData} method, which maps from the data representation to the graphic drawing commands. 
+
+As discussed above (in Section~\ref{sec:view-parameters}), when using the symbol template base-class, the \textit{fromData} method will usually call the symbol's internal \textit{dataToViewParams} which performs the mapping from semantic to a minimal set of graphic values which are then used to draw the graphics, by sending drawing commands to \drawsocket accessed through the \uiapi, including the HTML dataset storage, as described above (in Section~\ref{graphic_display_format}).
+
+A typical drawing command would look something like:
+%1. send the drawing commands to the browser display (via \drawsocket usually, using the `drawsocketInput` API method). Include the data content into the symbol by using the HTML `dataset` (you can use `ui\_api.dataToHTML(dataObj)` helper function to create the `data-` tags)
+
+\begin{lstlisting}[ language=Javascript]
+    ui_api.drawsocketInput({
+        key: "svg",
+        val: {
+            class: `${className} symbol`,
+            id: uniqueID,
+            parent: container.id,
+            ...newView, 
+            ...ui_api.dataToHTML(dataObj)
+        }
+    }) 
+\end{lstlisting}
+
+\noindent
+Here, we use the JS spread operator ``\ldots'' to merge the \textit{newView} variable, holding \drawsocket format SVG data, and the HTML dataset information, encoded via the \uiapi \textit{dataToHTML} helper function into the \textit{val} object with the associated ``svg'' \drawsocket keyword. The object is then sent to \drawsocket via the \uiapi \textit{drawsocketInput} helper function to be added to the browser screen.
+
+
+\section{Custom User Methods}\label{sec:user_methods}
+
+Users may also create their own additional methods in either ui or io-definitions and call them from outside processes over OSC, or from other symbol definitions, using the ``call'' keyword.\footnote{\symbolist will pass the same call request to both definitions, so if both have a function of the same name they will both be called.}
+
+As elsewhere, \symbolist uses \drawsocket syntax, and requires two parameters  in the \textit{val} object need to lookup and execute the method:
 
 \begin{itemize}\itemsep0pt 
  \item \textit{class}: name of the class to lookup.
@@ -729,7 +799,7 @@ All of the parameters in the \textit{val} object will be passed to the function 
 
 User class methods can be used to apply operations to the score or ui, for example transposing all pitches on the ``Staff'' named ``oboe'' might look like this:
 
-\begin{lstlisting}[
+\begin{lstlisting}[language=Javascript,
   mathescape,
   columns=fullflexible,
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
@@ -745,197 +815,52 @@ User class methods can be used to apply operations to the score or ui, for examp
 }
 \end{lstlisting}
 
-The implementation in the io definition could then lookup the class ``Staff'' and call the method ``transpose'', passing the entire \textit{val} object to the function as an argument. The ``transpose'' function would then lookup the ``oboe'' staff in the model, and then iterate all of its contents, offsetting the ``note'' values by the number of steps specified in the method arguments.
-
-\section{Symbol Definition Functional Examples}
-
-\subsection{Creating Symbols from OSC input}
-
-The simplest example of mapping definition is the \textit{semantic to graphic} mapping definition.
-
-\subsubsection{OSC is received by the \iocontroller}
-
-The \iocontroller has a set of messages that it understands which can be used for a wide range of actions.
-\symbolist uses the \drawsocket \textit{key/val} message syntax, so each OSC bundle should be formatted with a \textit{key} address, which is a keyword flag to signal which routine should interpret the message in the \iocontroller's \textit{io\_receive} function; while the \textit{val} address contains an object (or array of objects) to be processed.
-
-And OSC message with the \textit{data} keyword can be used to add new semantic data objects to the score-model, and create new graphic symbols in the editor from an external process;  for example by generating scores through algorithmic processes, via textual authoring, via mapping from gestural controller, etc.
-
-Upon receiving an OSC message with a \textit{data} flag, the object attached to the \textit{val} address are added to the model, and then relayed to the \uicontroller.
-In the \uicontroller, the semantic data is mapped to graphic data using the symbol's \textit{class} definition. The class's name provides a mechanism to lookup the class definition in both controller scripts.
-
-For example, here is an OSC bundle using the \textit{data} key:
-
-\begin{lstlisting}[ mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
-{
-    /key : "data",
-    /val : {
-        /class : "FiveLineStaveEvent",
-        /id : "foo"
-        /container : "oboe",
-        /time : 0.13622,
-        /ratio : "7/4",
-        /duration : 0.1,
-        /amp : 1
-    }
-  }
-\end{lstlisting}
-
-The \textit{data} key has a few required and optional attributes:
-\begin{itemize}\itemsep0pt 
-  \item \textit{class}: (required) the class type of the object to create.
-  \item \textit{container}: (required) the \textit{id} of the container symbol class to put the object in.
-   \item \textit{id}: (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
-  \item Other required or optional parameters will depend on the symbol definition.
-\end{itemize}
-
-% this is the second part of the process:
-
-\subsubsection{Data to View Mapping in the \uicontroller}
-
-fromData
-
-If an OSC message is received containing data to create a new symbol, the \uicontroller calls the object's `fromData` function, which maps from the data representation to the graphic drawing commands. The `fromData` function should:
-1. send the drawing commands to the browser display (via \drawsocket usually, using the `drawsocketInput` API method). Include the data content into the symbol by using the HTML `dataset` (you can use `ui\_api.dataToHTML(dataObj)` helper function to create the `data-` tags)
-
-\begin{lstlisting}[ language=Javascript]
-    ui_api.drawsocketInput({
-        key: "svg",
-        val: {
-            class: `${className} symbol`,
-            id: uniqueID,
-            parent: container.id,
-            ...newView, 
-            ...ui_api.dataToHTML(dataObj)
-        }
-    }) 
-\end{lstlisting}
-
-
-\subsection{Creating Data from Graphic Interaction}
-
-briefly describe the sequences of events
- 
-
-createNewFromMouseEvent (template function)
-
-Working from the opposite direction, users can create semantic data entries in the score through graphic interaction. The process for achieving this is a bit more complicated than the 
-
+On receiving this OSC bundle, the \iocontroller will lookup the class ``Staff'' and attempt to call its method ``transpose'', passing the entire \textit{val} object to the symbol method as an argument. The user-defined ``transpose'' function might then do something like lookup the ``oboe'' staff in the model, and then iterate all of its contents, offsetting the ``note'' values by the number of steps specified in the method arguments.
 
 %%%%%
-
-\section{temp}
-
-%%
-\symbolist has built in handlers for a set of messages received via OSC, which can be extended by user scripts, using a key/val syntax, where the \textit{key} specifies the function to call, and the \textit{val} are the parameter values to use for the call.
-
-For example, here is a \textit{lookup} query to find elements that are returned by the parameters \textit{time} in the container with the \textit{id} ``trio''.
-
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-{
-    /key : "lookup",
-    /val : {
-        /time : 0.1,
-        /id : "trio"
-    }
-}
-
-\end{lstlisting}
-
-The OSC message API supports the following keys:
-\begin{itemize}\itemsep0pt 
-\item \textit{data}: adds a data object to the score, and sends to the ui to be mapped to graphical representation. Parameters include:
-\begin{itemize}\itemsep0pt 
-  \item \textit{class} (required) the class type of the object to create
-  \item \textit{container} (required) the container symbol class to put the object in (in case there are multiple containers that support the same symbol type)
-  \item \textit{id} (optional) an id to use for the data object, if non is specified a (long) unique string will be generated.
-  \item Other required or optional parameters will depend on the symbol definition.
-\end{itemize}
-
-\begin{lstlisting}[ mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
-{
-    /key : "data",
-    /val : {
-        /class : "fiveLineStaveEvent",
-        /id : "foo"
-        /container : "oboe",
-        /time : 0.13622,
-        /ratio : "7/4",
-        /duration : 0.1,
-        /amp : 1
-    }
-  }
-\end{lstlisting}
-
-
-\item \textit{lookup}: looks up a point in a container, based on a sorting function specified in the definition. For example, this can be used to get all events active at a given time. Parameters:
-
-\begin{itemize}\itemsep0pt 
-  \item \textit{id}: (required) the \textit{id} of the container to lookup in. Containers will generally iterate all child objects, so for example if you use the \textit{id} of the top level score you should be looking up in to all sub-containers.
-  \end{itemize}
-  
-\item \textit{getFormattedLookup}: optional function that might be defined in an \textit{io} script that outputs an object formatted for a different type of player/render. For example, this function might return a list of \textit{/x} and \textit{/y} values for use with the \textit{o.lookup~} Max object, or create a MIDI file export etc. All parameters included in the \textit{val} object will be sent to the \textit{getFormattedLookup} as a parameters object. Parameters:
-
-\begin{itemize}\itemsep0pt 
-  \item \textit{id}: (required)
-\end{itemize}
-\item \textit{call}: calls a function in the one or both of the class definitions. All of the parameters in the \textit{val} object will be passed to the function as an argument. Return values from the \textit{io} controller are with the tag \textit{return/io} and \textit{return/ui} from the \textit{ui}.
-\begin{itemize}\itemsep0pt 
-  \item \textit{class} (required) class of the object to call
-  \item \textit{method} (required) name of object function to call
-\end{itemize}
-
-\end{itemize}
-
-\begin{lstlisting}[
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-{
-    /key : "call",
-    /val : {
-        /function : "functionName",
-        /class : "className",
-        /id : "foo"
-        /someValue : 1,
-        /anotherValue : 2
-    }
-}
-\end{lstlisting}
-
-Note that the system will pass the same call to both definitions, so if both have a function of the same name they will both be called.
-* \textit{drawsocket}: forwards \drawsocket format messages directly to \drawsocket, bypassing the symbolist mapping.
-
-
 % screenshot
-\begin{figure*}[ht!]
-\centering
-\includegraphics[width=1.5\columnwidth]{nodescore.png}
-\caption{ \symbolist screenshot, showing some different types of staves, and editing capabilities.
-\label{fig:nodescore}}
-\end{figure*}
+%\begin{figure*}[ht!]
+%\centering
+%\includegraphics[width=1.5\columnwidth]{nodescore.png}
+%\caption{ \symbolist screenshot, showing some different types of staves, and editing capabilities.
+%\label{fig:nodescore}}
+%\end{figure*}
 
-\section{Conclusions and Future Developments}
+\section{Conclusions} % and Future Developments
+ 
+With the new symbol class definition system in place, initial experiments indicate that this new experimental \symbolist implementation should be able to handle a very wide variety of score and symbol structures, and provide the mechanisms for users to compose bi-directional mappings between semantic and graphic representation.
+The system seems to have a potential for many applications in digital media compositional practice, and may someday evolve into a fully functional authoring environment for computer performable symbolic notation.
 
-known issues
-- unable to dynamically refresh definitions in the browser using the require function after Electron v12, using Context Isolation\footnote{https://www.electronjs.org/docs/latest/tutorial/context-isolation} as suggested to address possible security issues, currently webpack is used to bundle the definitions
->> need to look into what is possible, since for user defined scripts we definitely will want to be able to tweak them without running webpack again.
+In order to further evaluate the robustness of the system, the next step will be to go through the process of developing complete definition libraries for working with different types of notation systems. As a test case, currently one of the PhD students at the HfMT Hamburg has been working on a set of definitions for common practice notation, which is planned for presentation at the 2023 TENOR conference, along with other experimental approaches.
 
-continue work on CP notation
-GUI for definitions
-C/C++ score player, optimized for fast lookup - write to buffer?
-further experiments in representation, spatial audio, eurorack modules, 
-connect with antescofo?
-connect with faust? create audio code via faust, or maybe pd?
-networked display via \drawsocket compose on tablets with pen?
+One challenge that may need to be addressed is the ease or difficulty there is in creating new symbol definitions. At the moment the system is based in Javascript, which means that the user must program the definitions with textural code. However, as a graphic oriented authoring environment, it would be convenient if there were some way to create new symbol definitions graphically, or at least within the \symbolist graphical environment. 
+In the process of creating test definition libraries, further research is planned to develop a GUI for symbol definitions, and if possibly streamline the process of bidirectional mapping. For example, most mathematical operations have an inverse operation, and so perhaps there could be a GUI interface that provides tools to define both mapping directions simultaneously.
+
+The Electron framework is currently working well for cross platform app development, however there have been some issues that came up after Electron version 12 which introduced new security measures, including context isolation\footnote{https://www.electronjs.org/docs/latest/tutorial/context-isolation}, and increase limitation of the using the require function to import user libraries. In order to function in a web-safe way, \symbolist is currently using Webpack\footnote{https://webpack.js.org/} to bundle the JS classes into a single file that is loaded on startup. Previously, users were able to dynamically load symbol definitions at run time, which seems like a more natural application working model. 
+However, since \symbolist is now browser-based and using the same system as \drawsocket for dynamic graphic rendering, there is also the possibility of networked use of \symbolist, for example, in connection with a graphic multitouch interface (iPad etc.), it would be possible to interact with \symbolist over a network, and therefore possibly the web-security measures are important. 
+More testing is needed to determine which features are the most important.
+
+For playback/sequencing of \symbolist scores, currently users can send either the \textit{lookup} or \textit{lookupFormatted} messages to the \iocontroller, which will then respond with data that can be used to perform the score in another software like Max, Pd, SuperCollider, etc.
+The lookup is currently implemented in Javascript, which is not the fastest or most temporally precise method of playing back the score.
+As a starting point, a Max external called \textit{o.lookup$\sim$}, which accepts a list of x and y coordinate points and reads through the sequence of points via a sample-rate phase input.
+This system works quite will for single data sequences (i.e. value of $y$ at point $x$), however for more robust playback, it might be worthwhile to develop a C/C++ based database lookup system, which could provide optimized getter methods for data playback. 
+For example, this might take the form of a Max external that can read a \symbolist score and provide optimized access for playback (possibly updated in realtime via connection to the \symbolist server).
+Or even further, it could be imagined that a score could be exported to playback in a DAW like Ableton Live.
+It could also be possible to attach links to other OSC sequencing applications like IRCAM's Antescofo expression language.
+
+Other development directions that may be interesting to pursue would be to integrate other frameworks into the application.
+Some first steps for 3D graphics have begun with the introduction of the three.js\footnote{https://threejs.org/} library, visible in the rotated cubes in Figure~\ref{fig:screenshot}, however more work is needed to provide tools for manipulating 3D graphics.
+In the area of notation for spatial movement, there are plans to continue development of trajectories (visible in the curves attached to note events in Figure \ref{fig:screenshot}, and to connect \symbolist with the ICST's Spatialization Symbolic Music Notation (SSN).
+
+In the audio domain, it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Gen~ DSP code, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
+
+There are very many possibilities for the future development of \symbolist, and so far it seems that the framework is providing a solid ground for the creation of new authoring environments. In a way, \symbolist is a meta-environment, an application that aims to ease the process of creating new authoring environments.
+Like the creation of a new instrument, the challenge then is to work through the difficulties of creating the instrument, so that the instrument can be learned to play, and then, finally, the instrument can be used for the creation of new kinds of art.
 
 \begin{acknowledgments}
-thanks james! thanks georg! thanks jean!
+
+A special thanks to James Tsz-Him Cheung for his work on the common practice notation definitions, which is greatly helping push \symbolist forward, and especially thank you to Prof. Georg Hajdu for his collaboration and ongoing support for this work.
+
 \end{acknowledgments} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
