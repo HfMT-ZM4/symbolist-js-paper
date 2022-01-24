@@ -29,8 +29,7 @@
 %\usepackage[font=footnotesize]{subfig}
 
 
-% REDEFINE THESE VARIABLES:
-\def\papertitle{Symbolist: bidirectional mapping developments}
+\def\papertitle{Symbolist: new developments}
 \def\firstauthor{Rama Gottfried}
 %\def\secondauthor{James Tsz-Him Cheung}
 %\def\thirdauthor{Georg Hajdu}
@@ -61,7 +60,7 @@
 % Saves a lot of output space in PDF... after conversion with the distiller
 % Delete if you cannot get PS fonts working on your system.
 
-\def\oscfontsize{\footnotesize}
+\def\oscfontsize{\tiny}
 
 
 % pdf-tex settings: detect automatically if run by latex or pdflatex
@@ -206,8 +205,9 @@ problem:
 a lot of mapping is still needed
 
 % drawsocket
-\subsection{Drawsocket}\label{sec:drawsocket}
+\section{Drawsocket}\label{sec:drawsocket}
 
+At the end of 2018, and first half of 2019 we developed \drawsocket
 
 mention that in addition to the front end that the drawsocket message format
 \cite{gottfried2019drawsocket}
@@ -322,7 +322,7 @@ The current modes are:
 \item \textit{Inspector}: if a user has selected an object and then types the letter [i], an inspector window appears showing the \textit{semantic data} corresponding to the symbol's graphical information (datatypes are discussed further in section~\ref{sec:representation} below).
 \end{itemize}
 
-% UX
+% UX -- maybe take this out, or integrate it with the above to save space
 
 \subsection{User Experience}\label{sec:ux}
 
@@ -379,6 +379,7 @@ The main attributes used in \symbolist semantic data objects are:
 In addition to the required \textit{id} and \textit{class} attributes, symbol objects may include any number of other \textit{attributes}\footnote{The term \textit{attribute} is used here interchangeably with properties, parameters, aspects, etc.} of the symbol (\textit{pitch}, \textit{amplitude}, etc.). For example a simple semantic object written in JSON might look like:
 
 \begin{lstlisting}[
+belowskip=-2 \baselineskip,
   mathescape,
   columns=fullflexible,
   breaklines=true,
@@ -402,6 +403,7 @@ Container symbols function to frame their contents, giving reference and context
 When a symbol contains other symbols, the child symbols are stored as an array in the object's \textit{contents} field. For example an imaginary class ``timeline'', which holds two types of leg actions, we might write something like:
 
 \begin{lstlisting}[
+belowskip=-2 \baselineskip,
   mathescape,
   columns=fullflexible,
   breaklines=true,
@@ -440,13 +442,15 @@ The current default initialization config file looks like this:
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[
+belowskip=-2 \baselineskip,
+ language=Javascript,
   mathescape,
   columns=fullflexible,
   breaklines=true,
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
 ]
 {
-    "about" : "symbolist will read a json file to configure the palette setup, this can be used to dynamically change the application layout and tools",
+    "about" : "some metatdata",
     "id" : "Score",
     "class" : "RootSymbol",
     "tools" : [],
@@ -501,7 +505,9 @@ Like the JSON score initialization file above, the main application window is se
 
 The \symbolist format for an SVG \textit{symbol} is a one top group ($<$g$>$) elements, with two sub-groups for \textit{display} and \textit{contents}, using HTML/CSS class names. The most simple SVG symbol would be:
 
-\begin{lstlisting}[mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
+\begin{lstlisting}[
+belowskip=-2 \baselineskip,
+mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
 <g  id="foo" class="SymbolClassName symbol">
     <g class="SymbolClassName display"></g>
     <g class="SymbolClassName contents"></g>
@@ -519,6 +525,7 @@ Symbols and containers could also potentially be HTML elements instead of SVG. I
 html:
 
 \begin{lstlisting}[
+belowskip=-2 \baselineskip,
   mathescape,
   columns=fullflexible,
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
@@ -539,6 +546,7 @@ For example, mapping our imaginary ``legs'' actions above, the corresponding SVG
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=Javascript,
+belowskip=-2 \baselineskip,
 %float=*,
 mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
 <g  id="bar" class="Timeline symbol" data-duration="1">
@@ -731,7 +739,9 @@ As an illustration of how data is processed through the \symbolist architecture,
 The \iocontroller has a small collection of built-in processes that can be called via OSC, the most important of which is the function to add new data elements to the score and graphic display, accessible using the \textit{data} keyword.
 
 For example, here is an OSC bundle using the \textit{data} key:
-\begin{lstlisting}[  language=Javascript, mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
+\begin{lstlisting}[  language=Javascript, 
+belowskip=-2 \baselineskip,
+mathescape, columns=fullflexible, basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont ]
 {
     /key : "data",
     /val : {
@@ -767,7 +777,9 @@ As discussed above (in Section~\ref{sec:view-parameters}), when using the symbol
 A typical drawing command would look something like:
 %1. send the drawing commands to the browser display (via \drawsocket usually, using the `drawsocketInput` API method). Include the data content into the symbol by using the HTML `dataset` (you can use `ui\_api.dataToHTML(dataObj)` helper function to create the `data-` tags)
 
-\begin{lstlisting}[ language=Javascript]
+\begin{lstlisting}[ language=Javascript,
+belowskip=-2 \baselineskip,
+]
     ui_api.drawsocketInput({
         key: "svg",
         val: {
@@ -800,6 +812,7 @@ All of the parameters in the \textit{val} object will be passed to the function 
 User class methods can be used to apply operations to the score or ui, for example transposing all pitches on the ``Staff'' named ``oboe'' might look like this:
 
 \begin{lstlisting}[language=Javascript,
+belowskip=-2 \baselineskip,
   mathescape,
   columns=fullflexible,
   basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
@@ -846,20 +859,20 @@ As a starting point, a Max external called \textit{o.lookup$\sim$}, which accept
 This system works quite will for single data sequences (i.e. value of $y$ at point $x$), however for more robust playback, it might be worthwhile to develop a C/C++ based database lookup system, which could provide optimized getter methods for data playback. 
 For example, this might take the form of a Max external that can read a \symbolist score and provide optimized access for playback (possibly updated in realtime via connection to the \symbolist server).
 Or even further, it could be imagined that a score could be exported to playback in a DAW like Ableton Live.
-It could also be possible to attach links to other OSC sequencing applications like IRCAM's Antescofo expression language.
+It could also be possible to attach links to other OSC sequencing applications like IRCAM's Antescofo expression language\cite{giavitto2017time}.
 
 Other development directions that may be interesting to pursue would be to integrate other frameworks into the application.
 Some first steps for 3D graphics have begun with the introduction of the three.js\footnote{https://threejs.org/} library, visible in the rotated cubes in Figure~\ref{fig:screenshot}, however more work is needed to provide tools for manipulating 3D graphics.
-In the area of notation for spatial movement, there are plans to continue development of trajectories (visible in the curves attached to note events in Figure \ref{fig:screenshot}, and to connect \symbolist with the ICST's Spatialization Symbolic Music Notation (SSN).
+In the area of notation for spatial movement, there are plans to continue development of trajectories (visible in the curves attached to note events in Figure \ref{fig:screenshot}, and to connect \symbolist with the ICST's Spatialization Symbolic Music Notation (SSMN)\cite{ellberger2014spatialization}.
 
-In the audio domain, it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Gen~ DSP code, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
+In the audio domain, it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Gen$\sim$ DSP code, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
 
 There are very many possibilities for the future development of \symbolist, and so far it seems that the framework is providing a solid ground for the creation of new authoring environments. In a way, \symbolist is a meta-environment, an application that aims to ease the process of creating new authoring environments.
 Like the creation of a new instrument, the challenge then is to work through the difficulties of creating the instrument, so that the instrument can be learned to play, and then, finally, the instrument can be used for the creation of new kinds of art.
 
 \begin{acknowledgments}
 
-A special thanks to James Tsz-Him Cheung for his work on the common practice notation definitions, which is greatly helping push \symbolist forward, and especially thank you to Prof. Georg Hajdu for his collaboration and ongoing support for this work.
+A special thanks to James Tsz-Him Cheung for his work on the common practice notation definitions, which is greatly helping push \symbolist forward, and especially thank you to Prof. Dr. Georg Hajdu for his collaboration and ongoing support for this work.
 
 \end{acknowledgments} 
 
