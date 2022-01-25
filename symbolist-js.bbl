@@ -25,17 +25,27 @@
 M.~Wright, ``{Open Sound Control: an enabling technology for musical
   networking},'' \emph{Organised Sound}, vol.~10, no.~3, pp. 193--200, 2005.
 
-\bibitem{gottfried2015svg}
-R.~Gottfried, ``{SVG to OSC Transcoding: Towards a Platform for Notational
-  Praxis and Electronic Performance},'' in \emph{{Proceedings of the
-  International Conference on Technologies for Notation and Representation
-  (TENOR'15)}}, Paris, France, 2015.
-
 \bibitem{maccallum2015dynamic}
 J.~MacCallum, R.~Gottfried, I.~Rostovtsev, J.~Bresson, and A.~Freed, ``{Dynamic
   Message-Oriented Middleware with Open Sound Control and Odot},'' in
   \emph{{Proceedings of the International Computer Music Conference
   (ICMC'15)}}, Denton, TX, USA, 2015.
+
+\bibitem{gottfried2013studies}
+R.~Gottfried, ``{Studies on the Compositional Use of Space},'' IRCAM, Paris,
+  France, Tech. Rep., 2013.
+
+\bibitem{gottfried2015svg}
+------, ``{SVG to OSC Transcoding: Towards a Platform for Notational Praxis and
+  Electronic Performance},'' in \emph{{Proceedings of the International
+  Conference on Technologies for Notation and Representation (TENOR'15)}},
+  Paris, France, 2015.
+
+\bibitem{bresson2011om}
+J.~Bresson, C.~Agon, and G.~Assayag, ``{OpenMusic: Visual Programming
+  Environment for Music Composition, Analysis and Research},'' in
+  \emph{Proceedings of the ACM international conference on Multimedia --
+  OpenSource Software Competition}, Scottsdale, AZ, USA, 2011, pp. 743--746.
 
 \bibitem{gottfried2018symbolist}
 R.~Gottfried and J.~Bresson, ``Symbolist: An open authoring environment for
@@ -62,12 +72,6 @@ T.~J. West, A.~Bachmayer, S.~Bhagwati, J.~Berzowska, and M.~M. Wanderley, ``The
   design of the body: suit: score, a full-body vibrotactile musical score,'' in
   \emph{International Conference on Human-Computer Interaction}.\hskip 1em plus
   0.5em minus 0.4em\relax Springer, 2019, pp. 70--89.
-
-\bibitem{bresson2011om}
-J.~Bresson, C.~Agon, and G.~Assayag, ``{OpenMusic: Visual Programming
-  Environment for Music Composition, Analysis and Research},'' in
-  \emph{Proceedings of the ACM international conference on Multimedia --
-  OpenSource Software Competition}, Scottsdale, AZ, USA, 2011, pp. 743--746.
 
 \bibitem{didkovsky2008maxscore}
 N.~Didkovsky and G.~Hajdu, ``{MaxScore: Music Notation in Max/MSP},'' in

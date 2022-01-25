@@ -29,7 +29,7 @@
 %\usepackage[font=footnotesize]{subfig}
 
 
-\def\papertitle{Symbolist: new developments}
+\def\papertitle{Symbolist re-imagined: developing tools for user-defined bidirectional mapping}
 \def\firstauthor{Rama Gottfried}
 %\def\secondauthor{James Tsz-Him Cheung}
 %\def\thirdauthor{Georg Hajdu}
@@ -158,51 +158,70 @@ In the paper we discuss the evaluation and re-design of the application based on
 
 \section{Background}\label{sec:background}
 
-The \symbolist project was developed out of an organic  
+The origins of the \symbolist project can be traced back to 2011 when I was working on my PhD at UC Berkeley's Center for New Music and Audio Technologies (CNMAT). Around this time, I began composing in Adobe Illustrator using a plugin called Scriptographer\footnote{https://scriptographer.org/}, which allowed the user to create new drawing tools with Javascript that could then be used like a brush in Illustrator; much like you would use mouse interaction in programs like Processing\footnote{https://processing.org/}. This was perfect for my composition needs working with extended instrumental techniques, since I could then create a notation of whatever I needed and code it into a reusable graphic template, that could then be manipulated graphically in Illustrator. Additionally, since you had access to the mouse movement, you could create interactions that could be used to compose, for instance I often used what I called a ``notehead-line'', which was a note-head of some shape, with a line extending out from it to show its duration. Using Scriptographer, I was able to create a user interface where after clicking down on the Illustrator canvas to draw the note-head, I could then track the mouse drag to determine the end of the duration line.
 
-of compositional notation practice. 
+Scriptographer's drawing API provided a set of basic vector primitives and grouping methods that closely parallel the objects found in Scalable Vector Graphics (SVG) format~\footnote{https://www.w3.org/TR/SVG11} which is well supported in Adobe Illustrator. Using grouping methods in Scriptographer, you could create hierarchies of objects that would then be created in Illustrator as grouped objects visible as nested folders in the layers menu.
 
-how much of a background?
+Around the same time at CNMAT, I was deeply involved with developing approaches to instrument design using Open Sound Control (OSC)~\cite{wright:osc} as a principle data structuring encoding. One day, while working with Scriptographer, I had saved a score in Illustrator as SVG format and accidentally opened the SVG file in a text editor. In the SVG file I noticed that all of my graphic objects where there in a human readable format, and closely resembled the kind of nested objects that we were working on at CNMAT in the Odot library\cite{maccallum2015dynamic}. This gave me the idea that I could maybe translate the SVG information into OSC and then ``perform'' the OSC score in much the same way as you would a stream of OSC coming from a sensor based instrument. The first tests seemed promising, and so I logged it away for possible future use.
 
-In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\footnote{https://www.w3.org/TR/SVG11/}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
+Soon after, studying high-resolution spatial audio rendering systems, I needed to find a way to compose spatial movements in a way that would connect with my graphic compositional practice. After some initial experiments using Blender\footnote{https://www.blender.org/} to compose movements which could then be parsed via Python and sent out over OSC, I was confronted by a perceptual gap between common practice notation and 3D representation, which seemed too difficult to address in the limited time I had, and so I fell back on using automation controls in Ableton Live\footnote{https://www.ableton.com/en/} and sending OSC to control the movements using Max for Live\footnote{https://cycling74.com/}. This was functional, but had the limitation of forcing the composer to separate each data parameter into separate streams of data, whereas in a symbolic representation different graphic attributes can indicate different elements of the data at the same time. Following these experiences~\cite{gottfried2013studies} I later returned to the SVG-OSC transcoding idea, and produced the first working model which was presented at the 2015 TENOR conference~\cite{gottfried2015svg}.
 
-Initially developed as a method for performing vector graphics, 
-SVG-OSC  \cite{gottfried2015svg}
+In the meantime, the Scriptographer project was abandoned by its developers after Adobe drastically changed their plugin API in version CS6. Rather than recode the project from scratch, the authors went on to create Paper.js\footnote{http://paperjs.org/}, which has some similarities with Scriptographer, but is more closely related to Processing, since it no longer is bound to the Illustrator application environment. This created a stumbling block for the SVG-OSC work, since I was relying on Scriptographer and its link to Illustrator as primary tools for the creation of easy to print scores for musicians to perform with. Additionally, working with preliminary OSC transcoding tests I found that it was becoming somewhat complicated to parse complex hierarchies of symbols in order to play them back via OSC streams, and so in 2017 I began work in collaboration with OpenMusic developer Jean Bresson~\cite{bresson2011om}, through a Ircam-ZKM Musical Research Residency towards the goal of creating a system that could replace the Scriptographer/Illustrator approach that I had developed so far.
 
-\cite{maccallum2015dynamic} %middleware
+\subsection*{Symbolist JUCE}\label{sec:juce_version}
+
+The first version of \symbolist was created in 2018 as a standalone JUCE\footnote{https://juce.com/} application, which provided the basic tools for drawing vector graphics, and query system that allowed \symbolist to be used as a lookup table for OSC stream playback~\cite{gottfried2018symbolist}.
+
+Working in JUCE seemed practical since it has a wide user base, and is used for audio plugins as well as Max and Ableton Live applications. However, working with SVG in JUCE proved to be an issue, since JUCE does not support the full SVG specification\footnote{https://forum.juce.com/t/complex-svg-files-fail-to-load-properly/26917/16}. However, a greater turning point in the project occurred towards the end of residency as I was thinking about how to simplify the process of using the SVG data for controlling digital processes.
+
+\subsection*{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
+
+In the first version of \symbolist as in the original SVG-OSC implementation, the graphic data needed to be interpreted by the application that received the data. Using Odot I would parse the graphic OSC information coming in from \symbolist, and then mapped the data to other processes, for instance synthesis parameters, or coordinates for spatial rendering. This process of interpretation requires that the interpreter know the context of the graphic objects. For example, that a circle is a note-head and not a rhythmic dot, and so on. Like keys on the axises of a graphic plot of information, musical symbols, meter, staff-lines and clefs, indicate to the reader how they should interpret the notes and rhythmic symbols written on the staff.
+
+The following phase of \symbolist development continued as I began work at the Hamburg University of Music and Theater, working with Georg Hajdu in the Innovative Hochschule project. Continuing on this idea of the \textit{clef} as being a plot ``key'' for interpretation, I began work on developing a system for \symbolist that would allow the user to create mappings internally within \symbolist. The idea being that since the data is already in hierarchical format in the application data structure, it makes sense to be able to interpret the data internally, and then stream OSC containing the pre-interpreted data rather than the raw graphic information which required complex parsing of the graphic hierarchies to rebuild the symbolic hierarchies that were visible to the eye based on traditional common practice notation. Further, I realized that what \symbolist \textit{really} needed was a system for \textit{bi-directional mapping}, where graphic data is interpreted as symbolic data with semantic meaning, and inversely, that the user should also be able to send symbolic semantic data to \symbolist, which could then translate the semantic data to a graphic representation. In 2018 I began working to implement this idea into the JUCE version, but soon needed to switch tracks to focus on a different notation issue for a project at the Innovative Hochschule, developing a platform for realtime networked score display.
+
+In 2019,  
+ 
+
+%In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\footnote{https://www.w3.org/TR/SVG11/}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
+
+%Initially developed as a method for performing vector graphics, 
+%SVG-OSC  \cite{gottfried2015svg}
+%
+%\cite{maccallum2015dynamic} %middleware
 %\cite{freed2014io} %io
 
+%
+%XML nature of SVG makes it easy to parse and map just like and OSC bundle.
+%
+%drawing on the OSC research at CNMAT, 
+%
+%just like a piece of paper, SVG could be freely mappable, and \textit{performable} like OSC.
+%
+%
+%
+%however it can require a lot of specialized code to handle different hierarchy structures and data at different levels in the hierarchy.
+%
+%
+%the first version of \symbolist was created as a standalone JUCE application
+%Ircam/ZKM~\cite{gottfried2018symbolist}
+%
+%% this can probably be in the backstory part
+%\subsection{JUCE Version}\label{sec:juce_version}
+%
+%explain juce version (include in overview?)
+%%\cite{krasner1988description}
+%focused on creating SVG and outputting OSC version (like SVG-OSC approach)
+%
 
-XML nature of SVG makes it easy to parse and map just like and OSC bundle.
-
-drawing on the OSC research at CNMAT, 
-
-just like a piece of paper, SVG could be freely mappable, and \textit{performable} like OSC.
-
-
-
-however it can require a lot of specialized code to handle different hierarchy structures and data at different levels in the hierarchy.
-
-
-the first version of \symbolist was created as a standalone JUCE application
-Ircam/ZKM~\cite{gottfried2018symbolist}
-
-% this can probably be in the backstory part
-\subsection{JUCE Version}\label{sec:juce_version}
-
-explain juce version (include in overview?)
-%\cite{krasner1988description}
-focused on creating SVG and outputting OSC version (like SVG-OSC approach)
-
-
-\subsection{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
-
-telling story of how we got where we are, conceptual steps
-
-idea of Clefs
-
-problem:
-a lot of mapping is still needed
+%\subsection{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
+%
+%telling story of how we got where we are, conceptual steps
+%
+%idea of Clefs
+%
+%problem:
+%a lot of mapping is still needed
 
 % drawsocket
 \section{Drawsocket}\label{sec:drawsocket}
