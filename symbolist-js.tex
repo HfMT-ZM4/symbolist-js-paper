@@ -180,73 +180,13 @@ In the first version of \symbolist as in the original SVG-OSC implementation, th
 
 The following phase of \symbolist development continued as I began work at the Hamburg University of Music and Theater, working with Georg Hajdu in the Innovative Hochschule project. Continuing on this idea of the \textit{clef} as being a plot ``key'' for interpretation, I began work on developing a system for \symbolist that would allow the user to create mappings internally within \symbolist. The idea being that since the data is already in hierarchical format in the application data structure, it makes sense to be able to interpret the data internally, and then stream OSC containing the pre-interpreted data rather than the raw graphic information which required complex parsing of the graphic hierarchies to rebuild the symbolic hierarchies that were visible to the eye based on traditional common practice notation. Further, I realized that what \symbolist \textit{really} needed was a system for \textit{bi-directional mapping}, where graphic data is interpreted as symbolic data with semantic meaning, and inversely, that the user should also be able to send symbolic semantic data to \symbolist, which could then translate the semantic data to a graphic representation. In 2018 I began working to implement this idea into the JUCE version, but soon needed to switch tracks to focus on a different notation issue for a project at the Innovative Hochschule, developing a platform for realtime networked score display.
 
-In 2019,  
- 
+\subsection*{Drawsocket and Symbolist JS}\label{sec:drawsocket}
 
-%In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\footnote{https://www.w3.org/TR/SVG11/}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
+At the end of 2018, and first half of 2019 we developed a \drawsocket, a server/client system providing a framework for realtime dynamic notation, using web-browsers for graphic rendering~\cite{gottfried2019drawsocket, hajdu2005quintet}. Based in node.js and standard web technologies of HTML, SVG, CSS, and Javascript\footnote{And by extension, provides access to other media via WebAudio, WebGL, etc.}, \drawsocket is essentially an OSC wrapper~\cite{freed2014io} for the web-browser, providing a homogeneous message API for the creating and realtime manipulation of browser elements.
 
-%Initially developed as a method for performing vector graphics, 
-%SVG-OSC  \cite{gottfried2015svg}
-%
-%\cite{maccallum2015dynamic} %middleware
-%\cite{freed2014io} %io
+Returning to \symbolist after the completion of the first concerts with \drawsocket, I began wondering if perhaps the framework of \symbolist needed to be re-designed from the prospective of bi-directional mapping, since I realized that this was probably the most important part of the graphic-data relationship that the system is based on. Working on \drawsocket showed me that SVG is very well integrated into modern browser display rendering, and having been working with node.js, I decided to see how fast it would be to implement a proof of concept using Electron.js\footnote{https://www.electronjs.org/} which is a cross-platform application development, using a node.js sever and Chrome as a front-end. While developing \drawsocket, I did some study into frameworks such like React\footnote{https://reactjs.org/} which provide object oriented ways of handling graphic interfaces, not unlike the approaches used in JUCE, however after working in JUCE, I wanted something lightweight and simple to start with.
 
-%
-%XML nature of SVG makes it easy to parse and map just like and OSC bundle.
-%
-%drawing on the OSC research at CNMAT, 
-%
-%just like a piece of paper, SVG could be freely mappable, and \textit{performable} like OSC.
-%
-%
-%
-%however it can require a lot of specialized code to handle different hierarchy structures and data at different levels in the hierarchy.
-%
-%
-%the first version of \symbolist was created as a standalone JUCE application
-%Ircam/ZKM~\cite{gottfried2018symbolist}
-%
-%% this can probably be in the backstory part
-%\subsection{JUCE Version}\label{sec:juce_version}
-%
-%explain juce version (include in overview?)
-%%\cite{krasner1988description}
-%focused on creating SVG and outputting OSC version (like SVG-OSC approach)
-%
-
-%\subsection{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
-%
-%telling story of how we got where we are, conceptual steps
-%
-%idea of Clefs
-%
-%problem:
-%a lot of mapping is still needed
-
-% drawsocket
-\section{Drawsocket}\label{sec:drawsocket}
-
-At the end of 2018, and first half of 2019 we developed \drawsocket
-
-mention that in addition to the front end that the drawsocket message format
-\cite{gottfried2019drawsocket}
-\cite{hajdu2005quintet}
-
-
-
-% Symbolist JS
-\section{Symbolist JS}\label{sec:symbolist_js}
-
-using \drawsocket as front end handler 
-
-
-a general overview about need for classes (actually this comes later when we get into the the discussion of format i.e. the way the data is represented.
-
-js and \drawsocket makes that easy(-ier)
-
-
-Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
-
+Using \drawsocket as a frontend, and node.js for the backend I found that I was able to get up and running very quickly with Electron, and so decided to continue \symbolist development in this direction, bringing the experience gained from the JUCE version to the creation of a deeper structure for the creation of symbol interpretations that integrate into the graphic manipulation of symbolic data. 
 
 % screenshot
 \begin{figure*}[ht!]
@@ -257,11 +197,11 @@ Figure~\ref{fig:screenshot} shows a screenshot from the Electron version.
 \end{figure*}
 
 
-% Implementations
-\section{Implementations}\label{sec:implementations}
-
-Electron\footnote{https://www.electronjs.org/} version (node + chrome w/ special electron IPC)
-Max version (node + jweb + Max patch for IPC)
+%% Implementations
+%\section{Implementation}\label{sec:implementations}
+%
+%Electron\footnote{https://www.electronjs.org/} version (node + chrome w/ special electron IPC)
+%Max version (node + jweb + Max patch for IPC)
 
 
 \begin{figure*}[ht!]
@@ -272,9 +212,9 @@ Max version (node + jweb + Max patch for IPC)
 \end{figure*}
 
 % Application Structure
-\subsection{Application Structure}\label{sec:application_structure}
+\section{Application Structure}\label{sec:application_structure}
 
-\symbolist is organized as a server-client model, comprising of:
+The new Javascript implementation of \symbolist is organized as a server-client model, comprising of:
 
 \begin{enumerate}\itemsep0pt 
 \item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \uicontroller runs in the browser (see Figure~\ref{fig:architecture}), and handles interaction via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
@@ -288,8 +228,11 @@ Max version (node + jweb + Max patch for IPC)
 \end{itemize}
 \end{enumerate}
 
-\subsubsection{Interprocess messaging syntax} 
+%Since the system is now based on a web-server / client model, we are able to also use Max's \textit{node.script} object, to run the sever from within Max, and additionally have created a version that runs in a \textit{jweb} object for use fully within Max.
+
+\subsection*{Interprocess messaging syntax} 
 \symbolist uses a \textit{key/val} message syntax for OSC and JSON interprocess communication developed in \drawsocket (discussed further in sections~\ref{sec:user_methods} and \ref{sec:osc_input}), where a \textit{key} address is used a keyword to signal which routine should interpret the message, and the \textit{val} address contains an object (or array of objects) to be processes.
+
 
 %The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. 
 %
@@ -342,22 +285,22 @@ The current modes are:
 \end{itemize}
 
 % UX -- maybe take this out, or integrate it with the above to save space
-
-\subsection{User Experience}\label{sec:ux}
-
-On entering the application, the editor loads a score or configuration file from the default load folder, which sets the top-level page setup and palette options. A typical sequence of creating a score might be as follows:
-\begin{enumerate}\itemsep0pt
-\item The user opens a workspace, with one or more default \textit{container symbols} displayed on the screen, for example an empty rectangle which is like a piece of paper.
-\item Selecting the ``paper'' container rectangle, the user then selects the container as the new \textit{context} by pressing the [s] key (or from the application menu).
-\item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
-\item Clicking on one of the palette toolbar symbol icons, puts the interface into \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
-\item Holding the Mac CMD button enters \textit{creation mode} and by default creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
-\item After clicking the symbol is placed in the container.
-\item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
-\item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
-\item Selecting and pressing the [e] button enters \textit{edit mode} which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
-\end{enumerate}
-
+%
+%\subsection{User Experience}\label{sec:ux}
+%
+%On entering the application, the editor loads a score or configuration file from the default load folder, which sets the top-level page setup and palette options. A typical sequence of creating a score might be as follows:
+%\begin{enumerate}\itemsep0pt
+%\item The user opens a workspace, with one or more default \textit{container symbols} displayed on the screen, for example an empty rectangle which is like a piece of paper.
+%\item Selecting the ``paper'' container rectangle, the user then selects the container as the new \textit{context} by pressing the [s] key (or from the application menu).
+%\item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
+%\item Clicking on one of the palette toolbar symbol icons, puts the interface into \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
+%\item Holding the Mac CMD button enters \textit{creation mode} and by default creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
+%\item After clicking the symbol is placed in the container.
+%\item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
+%\item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
+%\item Selecting and pressing the [e] button enters \textit{edit mode} which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
+%\end{enumerate}
+%
 
 \section{Data Representation}\label{sec:representation}
 
@@ -591,7 +534,7 @@ mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfa
 
 Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
 
-\symbolist provides several different options for sorting and looking up data (see Figure~\ref{fig:score-lookup}), which can serve as a structure for the performance of a ``score'', or other data formats. Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author (see section \ref{subsec:io_messages} for further discussion of performing data). 
+\symbolist provides several different options for sorting and looking up data (see Figure~\ref{fig:score-lookup}), which can serve as a structure for the performance of a ``score'', or other data formats. Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author.
 
 In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
 
@@ -653,22 +596,23 @@ In each controller context there are certain methods and variables that need to 
 
 %Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
-\subsection*{IO and UI data access scope}\label{sec:io_ui_elements}
-
-Since the \textit{ui} and \textit{io} controllers are run in separate processes\footnote{and potentially separate devices.} (Figure~\ref{fig:architecture}), there is no direct access to data stored in the other location. In other words, the \iocontroller does not have direct access to the symbol's drawing information, and the \uicontroller does not have direct access to the score or UDP port for sending OSC message.
-
-Loosely following the MVC pattern,\footnote{https://developer.mozilla.org/en-US/docs/Glossary/MVC} the concerns of drawing are kept within the browser-side \uicontroller, with all messages between the \textit{ui} and \textit{io} processes are in \drawsocket JSON format, with all symbol data expressed in its \textit{semantic} form.
-Meanwhile the \iocontroller manages the \textit{score} and handles external OSC communication, relaying messages to the \uicontroller as needed.
-
-As discussed above, the graphic representation takes advantage of the HTML dataset feature, which provides a mechanism for storing the semantic data inside the graphic context (see section~\ref{sec:dataset}).
-Since ui-definitions are running in a web-browser, they are able to make use of the standard HTML-DOM JS methods for fast querying of elements (i.e. querySelector, getElementById, etc.)\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Document} to retrieve graphic as well as semantic data stored in the display hierarchy.
-
-To provide similar data query access in the \iocontroller, the score data is stored in two JS objects: the \textit{score}, which stores the semantic data in a hierarchical tree structure, and a object named \textit{model}, which is a flat lookup table by unique id, with links to object references to the coordinated object in the score tree.
-
-Since the ui- and io-controllers run in parallel they need to keep the other side updated in case of any alteration to the score data. 
-Updates sent from the \iocontroller to the UI can be as simple as sending a new score which will trigger a redrawing of the graphics in the UI view. 
-Updates from graphic user interaction require mapping from the graphic to semantic representation, which is handled in the browser. Any changes are sent back to the \iocontroller where the new semantic values are updated in the \textit{model} (which automatically update the \textit{score}, since both objects hold JS references to the same JS objects).
-
+%
+%\subsection*{IO and UI data access scope}\label{sec:io_ui_elements}
+%
+%Since the \textit{ui} and \textit{io} controllers are run in separate processes\footnote{and potentially separate devices.} (Figure~\ref{fig:architecture}), there is no direct access to data stored in the other location. In other words, the \iocontroller does not have direct access to the symbol's drawing information, and the \uicontroller does not have direct access to the score or UDP port for sending OSC message.
+%
+%Loosely following the MVC pattern,\footnote{https://developer.mozilla.org/en-US/docs/Glossary/MVC} the concerns of drawing are kept within the browser-side \uicontroller, with all messages between the \textit{ui} and \textit{io} processes are in \drawsocket JSON format, with all symbol data expressed in its \textit{semantic} form.
+%Meanwhile the \iocontroller manages the \textit{score} and handles external OSC communication, relaying messages to the \uicontroller as needed.
+%
+%As discussed above, the graphic representation takes advantage of the HTML dataset feature, which provides a mechanism for storing the semantic data inside the graphic context (see section~\ref{sec:dataset}).
+%Since ui-definitions are running in a web-browser, they are able to make use of the standard HTML-DOM JS methods for fast querying of elements (i.e. querySelector, getElementById, etc.)\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Document} to retrieve graphic as well as semantic data stored in the display hierarchy.
+%
+%To provide similar data query access in the \iocontroller, the score data is stored in two JS objects: the \textit{score}, which stores the semantic data in a hierarchical tree structure, and a object named \textit{model}, which is a flat lookup table by unique id, with links to object references to the coordinated object in the score tree.
+%
+%Since the ui- and io-controllers run in parallel they need to keep the other side updated in case of any alteration to the score data. 
+%Updates sent from the \iocontroller to the UI can be as simple as sending a new score which will trigger a redrawing of the graphics in the UI view. 
+%Updates from graphic user interaction require mapping from the graphic to semantic representation, which is handled in the browser. Any changes are sent back to the \iocontroller where the new semantic values are updated in the \textit{model} (which automatically update the \textit{score}, since both objects hold JS references to the same JS objects).
+%
 \subsection*{API Functions}\label{sec:api_functions}
 
 In each controller context, there are a set of helper functions for use by symbol definitions stored in global objects called \uiapi and \ioapi, which provide many essential operations.
@@ -884,7 +828,7 @@ Other development directions that may be interesting to pursue would be to integ
 Some first steps for 3D graphics have begun with the introduction of the three.js\footnote{https://threejs.org/} library, visible in the rotated cubes in Figure~\ref{fig:screenshot}, however more work is needed to provide tools for manipulating 3D graphics.
 In the area of notation for spatial movement, there are plans to continue development of trajectories (visible in the curves attached to note events in Figure \ref{fig:screenshot}, and to connect \symbolist with the ICST's Spatialization Symbolic Music Notation (SSMN)\cite{ellberger2014spatialization}.
 
-In the audio domain, it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Gen$\sim$ DSP code, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
+In the audio domain, it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Gen$\sim$ DSP code.%, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
 
 There are very many possibilities for the future development of \symbolist, and so far it seems that the framework is providing a solid ground for the creation of new authoring environments. In a way, \symbolist is a meta-environment, an application that aims to ease the process of creating new authoring environments.
 Like the creation of a new instrument, the challenge then is to work through the difficulties of creating the instrument, so that the instrument can be learned to play, and then, finally, the instrument can be used for the creation of new kinds of art.
@@ -900,3 +844,7 @@ A special thanks to James Tsz-Him Cheung for his work on the common practice not
 \balance % balance the columns on the last page
 \bibliography{symbolist}
 \end{document}
+
+
+
+%In this paper we present a case study for the creation of an open system for graphically developing symbolic notation which can function both as professional quality print or online documentation, as well as a computer performable score in electro-acoustic music and other computer aided contexts. Leveraging Adobe Illustrator’s graphic design tools and support for the Scalable Vector Graphics (SVG) file format~\footnote{https://www.w3.org/TR/SVG11/}, the study shows that SVG, being based on Extensible Markup Language (XML), can be similarly used as a tree-based container for score information. In the study, OpenSoundControl (OSC)~\cite{wright:osc}  serves as middleware used to interpret the SVG representation and finally realize this interpretation in the intended media context (electronic music, spatial audio, sound art, kinetic art, video, etc.). The paper discusses how this interpretive layer is made possible through the separation of visual representation from the act of rendering, and describes details of the current implementation, and outlines future developments for the project.
