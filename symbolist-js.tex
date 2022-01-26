@@ -29,7 +29,7 @@
 %\usepackage[font=footnotesize]{subfig}
 
 
-\def\papertitle{Symbolist re-imagined: developing tools for user-defined bidirectional mapping}
+\def\papertitle{Bidirectional graphic-semantic mapping for media notation authoring and performance: Symbolist Re-imagined}
 \def\firstauthor{Rama Gottfried}
 %\def\secondauthor{James Tsz-Him Cheung}
 %\def\thirdauthor{Georg Hajdu}
@@ -142,11 +142,11 @@
 % ABSTRACT
 % fill in after finishing the paper
 \begin{abstract}
-
-maybe already start with history here, and then continue to symbolist?
-
   \symbolist is an in-development application for experimental notation, with the goal of creating a working environment for developing symbolic notation for multimedia which can be interpreted and performed by electronics. The program aims to provide an open play space, with tools for experimentation, and thinking visually about relationships between representation and interpretation in media performance. 
-In the paper we discuss the evaluation and re-design of the application based on the need for a bi-directional mapping framework for working with symbolic notation and its corresponding data representations.
+
+The evaluation and re-design of the application based on the need for a bi-directional mapping framework for working with symbolic notation and its corresponding data representations.
+
+In the paper we begin with an overview of the project context background, followed by an introduction to the new symbol definition system, and conclude with a perspective on future development directions.
 
 \end{abstract}
 
@@ -158,14 +158,28 @@ In the paper we discuss the evaluation and re-design of the application based on
 
 \section{Background}\label{sec:background}
 
-The origins of the \symbolist project can be traced back to 2011 when I was working on my PhD at UC Berkeley's Center for New Music and Audio Technologies (CNMAT). Around this time, I began composing in Adobe Illustrator using a plugin called Scriptographer\footnote{https://scriptographer.org/}, which allowed the user to create new drawing tools with Javascript that could then be used like a brush in Illustrator; much like you would use mouse interaction in programs like Processing\footnote{https://processing.org/}. This was perfect for my composition needs working with extended instrumental techniques, since I could then create a notation of whatever I needed and code it into a reusable graphic template, that could then be manipulated graphically in Illustrator. Additionally, since you had access to the mouse movement, you could create interactions that could be used to compose, for instance I often used what I called a ``notehead-line'', which was a note-head of some shape, with a line extending out from it to show its duration. Using Scriptographer, I was able to create a user interface where after clicking down on the Illustrator canvas to draw the note-head, I could then track the mouse drag to determine the end of the duration line.
+The origins of the \symbolist project can be traced back to 2011, through the development of a composition practice in Adobe Illustrator using a plugin called Scriptographer,\footnote{https://scriptographer.org/} which allowed users to create new drawing tools in Javascript which could then be used in Illustrator as an interactive brush. 
+As a composer working with experimental instrumental techniques and spatial notation, Scriptographer was perfect for my composition needs at the time, since you could design a notation for a given technique or musical expression and then code it as an interactive graphic function, which could then be manipulated graphically in Illustrator. 
+With the access to the mouse movement, interactions could be used to compose different elements of the notation, much in the same way that mouse interaction is used in programs like Processing.\footnote{https://processing.org/}
 
-Scriptographer's drawing API provided a set of basic vector primitives and grouping methods that closely parallel the objects found in Scalable Vector Graphics (SVG) format~\footnote{https://www.w3.org/TR/SVG11} which is well supported in Adobe Illustrator. Using grouping methods in Scriptographer, you could create hierarchies of objects that would then be created in Illustrator as grouped objects visible as nested folders in the layers menu.
+For example, a note with a spatially indicated duration typically is written as a note-head of some shape with a line extending out from it to show its duration. 
+Using Scriptographer, you could create an interaction for composing note-duration symbols, where clicking down on the Illustrator canvas places the note-head, and then using the mouse drag, determine the end of the duration line, ending at the location of the mouse up event.
 
-Around the same time at CNMAT, I was deeply involved with developing approaches to instrument design using Open Sound Control (OSC)~\cite{wright:osc} as a principle data structuring encoding. One day, while working with Scriptographer, I had saved a score in Illustrator as SVG format and accidentally opened the SVG file in a text editor. In the SVG file I noticed that all of my graphic objects where there in a human readable format, and closely resembled the kind of nested objects that we were working on at CNMAT in the Odot library\cite{maccallum2015dynamic}. This gave me the idea that I could maybe translate the SVG information into OSC and then ``perform'' the OSC score in much the same way as you would a stream of OSC coming from a sensor based instrument. The first tests seemed promising, and so I logged it away for possible future use.
+Further, you could also group elements to structure hierarchies of objects which would then appear in Illustrator as grouped objects, visible as nested folders in the layers menu.
 
-Soon after, studying high-resolution spatial audio rendering systems, I needed to find a way to compose spatial movements in a way that would connect with my graphic compositional practice. After some initial experiments using Blender\footnote{https://www.blender.org/} to compose movements which could then be parsed via Python and sent out over OSC, I was confronted by a perceptual gap between common practice notation and 3D representation, which seemed too difficult to address in the limited time I had, and so I fell back on using automation controls in Ableton Live\footnote{https://www.ableton.com/en/} and sending OSC to control the movements using Max for Live\footnote{https://cycling74.com/}. This was functional, but had the limitation of forcing the composer to separate each data parameter into separate streams of data, whereas in a symbolic representation different graphic attributes can indicate different elements of the data at the same time. Following these experiences~\cite{gottfried2013studies} I later returned to the SVG-OSC transcoding idea, and produced the first working model which was presented at the 2015 TENOR conference~\cite{gottfried2015svg}.
+%Scriptographer's drawing API provided a set of basic vector primitives and grouping methods that closely parallel the objects found in Scalable Vector Graphics (SVG) format~\footnote{https://www.w3.org/TR/SVG11} which is well supported in Adobe Illustrator. 
 
+Around the same time, I was studying at UC Berkeley's Center for New Music and Audio Technologies (CNMAT) developing approaches to instrument design using OpenSoundControl (OSC)~\cite{wright:osc} for data structuring. 
+One day, while working with Scriptographer, I had saved a score in Illustrator as Scalable Vector Graphics (SVG) format~\footnote{https://www.w3.org/TR/SVG11} and accidentally opened the SVG file in a text editor. 
+In the SVG file I noticed that all of the graphic objects where there in a human readable format, and closely resembled the kind of nested objects that we were working on at CNMAT in the Odot library\cite{maccallum2015dynamic}. This gave me the idea that I could maybe translate the SVG information into OSC and then ``perform'' the OSC score in much the same way as you would a stream of OSC coming from a sensor based instrument; in a similar spirit to Daphne Oram's ``Oramics''~\cite{manning2012oramics} and Xenakis' UPIC system~\cite{marino1993upic}, but with a greater focus on symbolic interpretation. 
+%The first tests seemed promising, and so I logged it away for possible future use.
+
+Soon after, while composing for a high-resolution spatial audio rendering system, I found that I was lacking a way to compose spatial movements graphically, in a way that would connect with instrumental notation practice.
+After some experiments using Blender\footnote{https://www.blender.org/} to draw 3D curves which could then be parsed via Python and sent out over OSC, I was dissatisfied by the perceptual differences between common practice notation and the kinds of 3D representation I was able to create in Blender; both had their merits, but what was missing was a compositional frame that connected the two representation paradigms into a unified notation system.
+And so due to the time constraints, for this piece I fell back on using automation controls in Ableton Live\footnote{https://www.ableton.com/en/} and sending OSC to control the movements using Max for Live.\footnote{https://cycling74.com/}
+This was practical, but this kind of automation approach, has the limitation of forcing the composer to separate each data parameter into separate streams of data (e.g. $x, y, z$), whereas in a symbolic representation multiple attributes can be indicated in unified graphic representation. 
+Following these experiences~\cite{gottfried2013studies} I later returned to the SVG-OSC transcoding idea, and produced the first working model which was presented at the 2015 TENOR conference~\cite{gottfried2015svg}.
+%here
 In the meantime, the Scriptographer project was abandoned by its developers after Adobe drastically changed their plugin API in version CS6. Rather than recode the project from scratch, the authors went on to create Paper.js\footnote{http://paperjs.org/}, which has some similarities with Scriptographer, but is more closely related to Processing, since it no longer is bound to the Illustrator application environment. This created a stumbling block for the SVG-OSC work, since I was relying on Scriptographer and its link to Illustrator as primary tools for the creation of easy to print scores for musicians to perform with. Additionally, working with preliminary OSC transcoding tests I found that it was becoming somewhat complicated to parse complex hierarchies of symbols in order to play them back via OSC streams, and so in 2017 I began work in collaboration with OpenMusic developer Jean Bresson~\cite{bresson2011om}, through a Ircam-ZKM Musical Research Residency towards the goal of creating a system that could replace the Scriptographer/Illustrator approach that I had developed so far.
 
 \subsection*{Symbolist JUCE}\label{sec:juce_version}
