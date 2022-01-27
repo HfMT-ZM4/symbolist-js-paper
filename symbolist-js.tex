@@ -40,12 +40,12 @@
 \usepackage{xspace}
 \def\symbolist{\textsc{symbolist}\xspace}
 \def\drawsocket{\textsc{drawsocket}\xspace}
-\def\uicontroller{\textit{ui\_controller}\xspace}
-\def\iocontroller{\textit{io\_controller}\xspace}
-\def\uiapiFunction{\textit{ui\_api}}
-\def\uiapi{\textit{ui\_api}\xspace}
-\def\ioapiFunction{\textit{io\_api}}
-\def\ioapi{\textit{io\_api}\xspace}
+\def\uicontroller{\textit{ui-controller}\xspace}
+\def\iocontroller{\textit{io-controller}\xspace}
+\def\uiapiFunction{\textit{ui-api}}
+\def\uiapi{\textit{ui-api}\xspace}
+\def\ioapiFunction{\textit{io-api}}
+\def\ioapi{\textit{io-api}\xspace}
 \makeatletter
 \newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
 \makeatother
@@ -208,13 +208,13 @@ The following phase of \symbolist development continued as I began work at the H
 Continuing from the idea of the \textit{clef} as a graphic symbol that contextualizes the notation on a musical staff, I began work on developing a system for \symbolist that would allow users to define interpretive symbols for hierarchical context parsing.
 Since the data is already in hierarchical format inside the application's data structure, it was logical that \symbolist could interpret the graphics internally, and then stream OSC post parsing and mapping, rather than streaming the raw graphic information which required complex parsing of the graphic hierarchies to contextualize the symbol references, as in traditional common practice notation.
 
-Following this line of thought, it became clear that what \symbolist really needed was a system for \textit{bi-directional mapping}, where graphic data is interpreted as symbolic data with semantic meaning, and inversely, that the user should also be able to send symbolic semantic data to \symbolist, where it would be mapped to its graphic representation.
+Following this line of thought, it became clear that what \symbolist really needed was a system for \textit{bi-directional mapping}, where graphic data is interpreted as symbolic data with semantic meaning, and inversely, that the user should also be able to send data in its semantic representation to \symbolist, where it would be then mapped to its graphic representation.
 
 In 2018 I began implementing this idea into the JUCE version of \symbolist, but soon needed to switch tracks to focus on a different notation issue for a project at the Innovative Hochschule, developing a platform for realtime networked score display.
 
 \subsection*{Drawsocket and Symbolist JS}\label{sec:drawsocket}
 
-At the end of 2018, and first half of 2019 we developed a \drawsocket, a server/client system providing a framework for realtime dynamic notation, using web-browsers for graphic rendering~\cite{gottfried2019drawsocket, hajdu2005quintet}. 
+At the end of 2018, and first half of 2019 we developed a \drawsocket, a server/client framework for realtime dynamic notation, using web-browsers for graphic rendering~\cite{gottfried2019drawsocket, hajdu2005quintet}. 
 Based in node.js and standard web technologies of HTML, SVG, CSS, and Javascript, \drawsocket is essentially an OSC wrapper~\cite{freed2014io} for web-browsers,\footnote{And by extension, provides access to other media via WebAudio, WebGL, etc.} providing a homogeneous message API for the creation and realtime manipulation of browser elements.
 
 Returning to \symbolist after the first \drawsocket concerts, I began wondering if the framework of \symbolist needed to be re-designed from the prospective of bi-directional mapping, since I realized that this was most likely going to be the most important part of the graphic-data relationship that the system is developing towards. 
@@ -250,40 +250,32 @@ Using \drawsocket as a frontend, and node.js for the backend I found that I was 
 % Application Structure
 \section{Application Structure}\label{sec:application_structure}
 
-The new Javascript implementation of \symbolist is organized as a server-client model, comprising of:
+The new implementation of \symbolist is organized as a server-client model (Figure~\ref{fig:architecture}), comprising of:
 
-\begin{enumerate}\itemsep0pt 
-\item The \textit{editor}, a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The \uicontroller runs in the browser (see Figure~\ref{fig:architecture}), and handles interaction via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
-
-\item The \textit{symbolist server} runs in node.js (either in the context of Electron, or in Max's node.script object) and is comprised of: 
 \begin{itemize}\itemsep0pt 
 
-\item A HTTP web-server which serves the editor webpage, and manages messages between the \uicontroller and the \iocontroller via WebSocket connection, as well as handling operating system commands like reading and writing files.
+\item The main \symbolist application server, running in node.js, which serves the main display page and manages messages between the client and server via WebSocket\footnote{https://websockets.spec.whatwg.org} connection. 
+Within the main server, a child process called the ``\iocontroller''  handles input and output from external sources via OSC over a UDP socket, and maintains the ``\textit{score}'', a database of hierarchical score elements, stored in \symbolist ``\textit{semantic representation}'' format (Section \ref{sec:representation}).
 
-\item  The \iocontroller script runs inside the \textit{symbolist server} and handles input and output from external sources via OSC over a UDP socket which can be used for a wide range of actions. The \iocontroller additionally maintains the central \textit{score} database in its semantic data format (described below).
+\item The ``\textit{editor},'' a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The ``\uicontroller'' runs in the browser, and handles interaction via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
+
+
 \end{itemize}
-\end{enumerate}
 
-%Since the system is now based on a web-server / client model, we are able to also use Max's \textit{node.script} object, to run the sever from within Max, and additionally have created a version that runs in a \textit{jweb} object for use fully within Max.
-
-\subsection*{Interprocess messaging syntax} 
-\symbolist uses a \textit{key/val} message syntax for OSC and JSON interprocess communication developed in \drawsocket (discussed further in sections~\ref{sec:user_methods} and \ref{sec:osc_input}), where a \textit{key} address is used a keyword to signal which routine should interpret the message, and the \textit{val} address contains an object (or array of objects) to be processes.
-
-
+Since the system is now based on a web-server model, we are able to also use Max's \textit{node.script} object to run the sever from within Max as an alternative to the Electron desktop app.
 %The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. 
 %
 %The \iocontroller can also be used to translate the score into other formats that can be performed by another sequencing tool or program like MaxMSP.
 %
 
-\section{Graphical Authoring and Interaction}\label{sec:editor} %should this be before or after the application structure?
+\section{Graphical Authoring and Interaction}\label{sec:editor} 
 
-%the palette symbol system is interesting maybe, to discuss how you can ``enter into'' a symbol, and then the possible sub-elements populate the palette.
+The \symbolist graphic user interface (Figure~\ref{fig:screenshot}) is designed around the idea of symbol objects and container contexts. Graphic objects, or ``\textit{symbols},'' are placed in ``\textit{container}'' contexts which define a reference framing used to interpret the meaning of the symbol.
 
-The graphic user interface of \symbolist (Figure~\ref{fig:screenshot}) is designed around the idea of symbol objects and containers. Graphic objects, or \textit{symbols}, are placed in \textit{container} references which define a framing used to interpret the meaning of the \textit{symbol}.
-
-In order to maintain an open and un-opinionated approach to authoring tools, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them within the application. 
-Rather, the interaction and meanings of the symbols are defined in a library of custom object \textit{definitions} which create these meanings through mapping semantic data to and from the graphic visualization. 
-Definitions can be shared between users and provide a mechanism to setup tailored composition environments for different authoring situations.
+In order to maintain an open and un-opinionated approach, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them. 
+Rather, the interaction and meanings of the symbols are defined in a library of custom object ``\textit{definitions}'' which specify meaning through mapping semantic data to-and-from its graphic representation. 
+Definitions provide a mechanism to design custom tailored composition environments for particular authoring situations, stored as Javascript libraries, which can be shared between users to be used as templates.
+%Since the application is programmed using web-brower technologies (JS/HTML/CSS/SVG) there are many ways to customize the layout, using CSS, or defining new object types. 
 
 %See below for more information about the API for creating symbol definitions. 
 
@@ -291,7 +283,6 @@ Definitions can be shared between users and provide a mechanism to setup tailore
 
 %main interesting thing to talk about is the palette system
 
-Since the application is programmed using web-brower technologies (JS/HTML/CSS/SVG) there are many ways to customize the layout, using CSS, or defining new object types. 
 The default \symbolist graphic editor (Figure~\ref{fig:screenshot}) provides the basic mechanisms for user interaction, to create scores through the creation of hierarchical object relationships.
 The main graphic components are:
 
@@ -732,9 +723,14 @@ Note that the \textit{lookup} and \textit{getFormattedLookup} methods are able t
 %all parameters included in the input \drawsocket syntax \textit{val} object will be included in the data received by \textit{lookup} and \textit{getFormattedLookup} as a parameters, and can then be used when performing the lookup, for example to perform multidimensional nearest neighbor lookup, etc.
 \section{Creating Symbols from OSC input}\label{sec:osc_input}
 
-As an illustration of how data is processed through the \symbolist architecture, we can follow the sequence of actions taken in the case of \textit{semantic to graphic} mapping; for example when algorithmically generating score data, using an outside process to create the data and sending it to \symbolist via OSC, using the \drawsocket key/val syntax.
+As an illustration of how data is processed through the \symbolist architecture, we can follow the sequence of actions taken in the case of \textit{semantic to graphic} mapping; for example when algorithmically generating score data, using an outside process to create new symbols via OSC messages.
 
-\subsubsection*{Data input via OSC}
+\symbolist uses the \drawsocket \textit{key/val} message syntax for OSC and JSON interprocess communication, where a ``\textit{key}'' address is used a keyword to signal which routine should interpret the message, and the ``\textit{val}'' address contains an object payload (or array of objects) to be processes.
+
+\subsubsection*{Symbol Creation from an External Process}
+
+%\subsection*{Interprocess messaging} 
+
 The \iocontroller has a small collection of built-in processes that can be called via OSC, the most important of which is the function to add new data elements to the score and graphic display, accessible using the \textit{data} keyword.
 
 For example, here is an OSC bundle using the \textit{data} key:
@@ -767,7 +763,7 @@ Upon receiving an OSC message with the \textit{key} ``data'', the object payload
 
 % this is the second part of the process:
 
-\subsubsection*{Data to View Mapping in the \uicontroller}
+\subsubsection*{Data-to-View Mapping in the \uicontroller}
 
 Received by the \uicontroller, the semantic data then is mapped to graphic data, by looking up the symbol's \textit{class} definition and calling the ui-definition's \textit{fromData} method, which maps from the data representation to the graphic drawing commands. 
 
