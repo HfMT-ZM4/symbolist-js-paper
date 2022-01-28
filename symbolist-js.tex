@@ -42,10 +42,10 @@
 \def\drawsocket{\textsc{drawsocket}\xspace}
 \def\uicontroller{\textit{ui-controller}\xspace}
 \def\iocontroller{\textit{io-controller}\xspace}
-\def\uiapiFunction{\textit{ui-api}}
-\def\uiapi{\textit{ui-api}\xspace}
-\def\ioapiFunction{\textit{io-api}}
-\def\ioapi{\textit{io-api}\xspace}
+\def\uiapiFunction{\textit{ui\_api}}
+\def\uiapi{\textit{ui\_api}\xspace}
+\def\ioapiFunction{\textit{io\_api}}
+\def\ioapi{\textit{io\_api}\xspace}
 \makeatletter
 \newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
 \makeatother
@@ -225,7 +225,7 @@ SVG is very well supported in modern browsers, and having just worked with node.
 Using \drawsocket as a frontend, and node.js for the backend I found that I was able to get up and running very quickly with Electron, and so decided to continue \symbolist development in this direction, bringing the experience gained from the JUCE version to the creation of a deeper structure for the creation of symbol interpretations that integrate into the graphic manipulation of symbolic data. 
 
 % screenshot
-\begin{figure*}[ht!]
+\begin{figure*}[hbt!]
 \centering
 \includegraphics[width=2\columnwidth]{symbolist.png}
 \caption{ \symbolist screenshot, showing some different types of staves, and editing capabilities.
@@ -240,7 +240,7 @@ Using \drawsocket as a frontend, and node.js for the backend I found that I was 
 %Max version (node + jweb + Max patch for IPC)
 
 
-\begin{figure*}[ht!]
+\begin{figure*}[hbt!]
 \centering
 \includegraphics[width=2\columnwidth]{symbolist-architecture2.pdf}
 \caption{ \symbolist architecture.
@@ -270,92 +270,127 @@ Since the system is now based on a web-server model, we are able to also use Max
 
 \section{Graphical Authoring and Interaction}\label{sec:editor} 
 
-The \symbolist graphic user interface (Figure~\ref{fig:screenshot}) is designed around the idea of symbol objects and container contexts. Graphic objects, or ``\textit{symbols},'' are placed in ``\textit{container}'' contexts which define a reference framing used to interpret the meaning of the symbol.
+The \symbolist graphic user interface (Figure~\ref{fig:screenshot}) is designed around units of symbolic objects and their contextual containers.
+Graphic ``\textit{symbol}'' objects are placed in ``\textit{container}'' symbols, which function as a context frame that can be used to interpret the meaning of the symbol.
 
-In order to maintain an open and un-opinionated approach, \symbolist tries not to specify how containers and symbols should look, act, or respond when you interact with them. 
+In order to maintain an open and un-opinionated approach, the \symbolist framework does not specify how containers and symbols should look, act, or respond when you interact with them. 
 Rather, the interaction and meanings of the symbols are defined in a library of custom object ``\textit{definitions}'' which specify meaning through mapping semantic data to-and-from its graphic representation. 
-Definitions provide a mechanism to design custom tailored composition environments for particular authoring situations, stored as Javascript libraries, which can be shared between users to be used as templates.
-%Since the application is programmed using web-brower technologies (JS/HTML/CSS/SVG) there are many ways to customize the layout, using CSS, or defining new object types. 
 
-%See below for more information about the API for creating symbol definitions. 
+Symbol definitions provide a mechanism to design custom tailored composition environments for particular authoring situations, stored as Javascript libraries, which can be shared between users, and used as templates.
+Leveraging web-browser technologies like JS, HTML, CSS, SVG, etc., there are many ways to customize the layout in \symbolist, and potentially, the definition libraries could completely transform the editor layout to serve a particular use-case scenario.
 
-\subsection{Interface Components}\label{sec:interface_components}
+\subsection*{Interface Components}\label{sec:interface_components}
 
-%main interesting thing to talk about is the palette system
-
-The default \symbolist graphic editor (Figure~\ref{fig:screenshot}) provides the basic mechanisms for user interaction, to create scores through the creation of hierarchical object relationships.
-The main graphic components are:
+%The default \symbolist graphic editor (Figure~\ref{fig:screenshot}) provides the basic mechanisms for user interaction, to create scores through the creation of hierarchical object relationships.
+The main graphic components of the default \symbolist graphic editor are:
 
 \begin{itemize}\itemsep0pt 
 \item 
-\textit{Document view}: the top level view of the application window, containing the document, and side bar. Sliders are provided to offset the view of the document, as well as basic zoom functionality.
+\textit{Score view}: the top level view of the application window, containing the main view, and side bar. Sliders are provided to offset the view of the document, as well as basic zoom functionality.
 \item 
-\textit{Palette}: a set of buttons on in the side bar of the program which display icons of the \textit{symbols} that have been defined for the current selected \textit{container}. 
+\textit{Palette}: a set of buttons in a side toolbar displaying icons of symbols that have been defined for the current selected container context. 
 \item 
-\textit{Tools}: a set of buttons that open tools for custom computer-assisted generation of new symbols, and applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
+\textit{Tools}: a set of buttons that open high-level tools, that can be used for operations like algorithmic generation of new symbols, or applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
 \item 
-\textit{Inspector}: a contextual menu for editing the semantic data of an object, which is then mapped to the graphic representation.
-\item 
-\textit{Menu bar}: (Electron version only) the menu bar at the top of the screen or window, which provides access to various application functions.
+\textit{Inspector}: a contextual menu for editing the semantic data of a selected symbol, which on update is mapped to the graphic representation and sent to the sever to update the main score database.
+%\item 
+%\textit{Menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
 \end{itemize}
-
-\subsection{Modes}\label{sec:modes}
-
-In the process of working in \symbolist, the user will shift between different modes, each of which have user-definable behaviors in the definitions library.
-The current modes are:
-\begin{itemize}\itemsep0pt 
-\item \textit{Palette}: clicking on an icon in the palette sidebar enables the user interaction assigned to the clicked symbol type.
-\item \textit{Creation}: holding down the CMD key (Mac) enters \textit{creation mode}, telling \symbolist to create a new \textit{symbol} of the type selected in the palette, similarly this action may enable different types of user interaction, for example snapping the symbol to specified pixels, etc.
-\item \textit{Selection}: clicking on a pre-existing \textit{symbol} in the document will \textit{select} the object, which notifies a callback in the definition script for possible interaction.
-\item \textit{Edit}: if a user has selected an object and then types the letter [e], \symbolist will attempt to enter \textit{edit mode} if there is one defined in the symbol definition script. This is useful for example in the case of a bezier curve; entering \textit{edit mode} could make visible the handles for the curve for editing.
-\item \textit{Inspector}: if a user has selected an object and then types the letter [i], an inspector window appears showing the \textit{semantic data} corresponding to the symbol's graphical information (datatypes are discussed further in section~\ref{sec:representation} below).
-\end{itemize}
-
-% UX -- maybe take this out, or integrate it with the above to save space
 %
-%\subsection{User Experience}\label{sec:ux}
+%\subsection{Modes}\label{sec:modes}
 %
-%On entering the application, the editor loads a score or configuration file from the default load folder, which sets the top-level page setup and palette options. A typical sequence of creating a score might be as follows:
-%\begin{enumerate}\itemsep0pt
-%\item The user opens a workspace, with one or more default \textit{container symbols} displayed on the screen, for example an empty rectangle which is like a piece of paper.
-%\item Selecting the ``paper'' container rectangle, the user then selects the container as the new \textit{context} by pressing the [s] key (or from the application menu).
-%\item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
-%\item Clicking on one of the palette toolbar symbol icons, puts the interface into \textit{palette mode}, where the mouse interaction is now designed for use with this specific symbol type.
-%\item Holding the Mac CMD button enters \textit{creation mode} and by default creates a preview of the symbol how it will appear when you click, and some text is displayed near the mouse that shows the semantic data associated with the graphic representation.
-%\item After clicking the symbol is placed in the container.
-%\item Depending on the symbol type, you may be able to drag the symbol to a new place in the container, and the associated data is updated as a result.
-%\item Selecting the symbol and hitting the [i] button, brings up the inspector window, where you can edit the data and see the graphics updated in response.
-%\item Selecting and pressing the [e] button enters \textit{edit mode} which is a modal context where different user interaction could change the values of the symbol in different ways. For example in edit mode you might be able to rotate an object in a certain way, or be able to visualize different connections to the graphic representation to other elements of the score which are not usually highlighted in the score view.
-%\end{enumerate}
+%In the \symbolist workflow, the user shifts between different modes, each of which has user-definable behaviors in the definitions library.
+%The current modes are:
+%\begin{itemize}\itemsep0pt 
+%\item \textit{Palette}: clicking on an icon in the palette sidebar enables the user interaction assigned to the clicked symbol type.
+%\item \textit{Creation}: holding down the CMD key (Mac) enters \textit{creation mode}, telling \symbolist to create a new \textit{symbol} of the type selected in the palette, similarly this action may enable different types of user interaction, for example snapping the symbol to specified pixels, etc.
+%\item \textit{Selection}: clicking on a pre-existing \textit{symbol} in the document will \textit{select} the object, which notifies a callback in the definition script for possible interaction.
+%\item \textit{Edit}: if a user has selected an object and then types the letter [e], \symbolist will attempt to enter \textit{edit mode} if there is one defined in the symbol definition script. This is useful for example in the case of a bezier curve; entering \textit{edit mode} could make visible the handles for the curve for editing.
+%\item \textit{Inspector}: if a user has selected an object and then types the letter [i], an inspector window appears showing the \textit{semantic data} corresponding to the symbol's graphical information (datatypes are discussed further in section~\ref{sec:representation} below).
+%\end{itemize}
 %
+\subsection*{User Experience}\label{sec:ux}
+
+On entering the application, the editor loads a score or configuration file from the default load folder, which sets the top-level page setup and palette options. A typical sequence of creating a score might be as follows:
+\begin{enumerate}\itemsep0pt
+\item The user opens a workspace, with one or more default container symbols displayed on the screen, for example an empty rectangle which is like a piece of paper.
+\item Clicking on the ``paper'' container rectangle \textit{selects} it, and then the user sets it as the new \textit{context} by pressing the [s] key.
+\item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
+\item Clicking on one of the palette toolbar symbol icons, puts the interface into ``\textit{palette mode}'', where the mouse interaction is now designed for use with this specific symbol type.
+\item Holding the Command(Mac)/Control(Win) key enters ``\textit{creation mode}'', which by convention draws a temporary preview of the symbol how it will appear when you click, and displays the corresponding semantic representation data as textual feedback.
+\item After clicking the symbol is placed in the container.
+\item Clicking and dragging a symbol graphically modifies its semantic data in reference to the container context. In the case of common practice notation this would be how you would change the time and pitch information of a symbol. The interaction results depend on the ``\textit{selection mode}'' specified in the symbol definition.
+\item User can also modify the semantic parameters as text, by selecting the symbol and hitting the [i] key, which brings up the inspector window, where you can edit the data directly.
+\item Pressing the [e] key enters ``\textit{edit mode}'' for the selected symbol, useful for editing of internal attributes that are less relative to the container symbol. For example, you would enter edit mode to adjust bezier curve anchor points.
+\end{enumerate}
 
 \section{Data Representation}\label{sec:representation}
 
-At the heart of \symbolist are two parallel forms of information expression: \textit{semantic data} and \textit{graphic representation} (Figure~\ref{fig:graphic-representation}).
+At the heart of \symbolist are two parallel forms of information expression: \textit{semantic} and \textit{graphic} representation (Figure~\ref{fig:graphic-representation}).
 
-\textit{Semantic data} specifies the various attributes of information about a symbolic object, in terms of the object's meaning to the author. 
-For example, the meaningful attributes of a \textit{note} object might be information about pitch and duration, or a \textit{point} object might contain x, y, and z values corresponding to the point's location in 3D space. In \symbolist \textit{semantic data} is thought of as the main holder of information in the system, which through grouping and hierarchical arrangement can be used to represent scores or other types of data structures.
+\textit{Semantic} data specifies the various attributes of information about a symbolic object in terms of the object's meaning to the author. 
+For example, the meaningful attributes of a \textit{note} object might be information about pitch and duration, or a \textit{point} object might contain x, y, and z values corresponding to the point's location in 3D space. 
+In \symbolist the semantic representation is thought of as the main holder of information, which through grouping and hierarchical arrangement can be used to represent scores or other types of data structures.
 
-The \textit{graphic representation} of the information is a visual expression of the semantic data, which is open in nature. The aim of \symbolist is to provide an agnostic framework for developing visual, symbolic, or other unknown representations of semantic data for use in multimedia composition practice; and so, one of the main functions of the new version of the software is to facilitate the creation of mapping relationships between different representations of the data.
+The \textit{graphic} representation is a symbolic visual expression of the semantic data, designed relative to the context defined by the author. 
 
+The aim of \symbolist is to provide an agnostic environment for developing, and composing with, new symbolic representations of semantic data for use in multimedia composition practice; and so, the central design consideration of this new implementation is to build a flexible framework for specifying a wide range of mapping relationships between semantic and graphic representations.
 
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=1\columnwidth]{graphic-representation.pdf}
-\caption{\textit{data} vs \textit{graphic} representation of the same information.
+\caption{\textit{Semantic} vs \textit{graphic} representation of the same information. Note: Figures \ref{fig:graphic-representation}-\ref{fig:score-lookup} use pseudocode for sake of brevity (see Sections \ref{sec:semantic} and \ref{sec:graphic_display_format} for  syntax details).
 \label{fig:graphic-representation}}
 \end{figure}
 
 
+\section{Mapping}\label{sec:mapping}
 
-\section{Symbols}\label{sec:symbols}
+Between each of these representation contexts there is a layer of mapping, with the \textit{semantic data} serving as the primary representation type. 
 
-In \symbolist terminology, a \textit{symbol} is an instance of a symbolic representation of data that connects the semantic, graphic, and possibly other media types of expression together as a multifaceted unit.
-Each \textit{symbol} is defined as a \textit{class} of object, which specifies the symbol's data structure and UI interaction, and data mapping to different representational contexts.
+\textit{Semantic data to graphic representation} mapping (Figure~\ref{fig:data-to-graphic}) is used for the creation of graphic symbols from a stream of input, for example from generative processes, textural authoring, or computer assisted composition systems~\cite{bresson2011om, didkovsky2008maxscore, agostini2015max, baca2015abjad, burloiu2017visual}.
 
-\section{Semantic Data Format}\label{sec:format}
+\textit{Graphic representation to semantic data} mapping (Figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
 
-Within the \symbolist application, semantic data is stored as javascript objects, and read/written in JSON format~\footnote{https://www.json.org/json-en.html}, which is transcoded to and from OSC for inter-application communication.
+\textit{Semantic data to performance media} mapping (Figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).
+
+Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.
+
+
+% mapping figures
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.9\columnwidth]{data-to-graphic.pdf}
+\caption{\textit{Semantic} data mapped to create a \textit{graphic} representation from input data. 
+\label{fig:data-to-graphic}}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.9\columnwidth]{graphic-to-data.pdf}
+\caption{If edited graphically, the updated graphic data is then mapped back to \textit{semantic data} representation. 
+\label{fig:graphic-to-data}}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=1\columnwidth]{score-lookup.pdf}
+\caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
+\label{fig:score-lookup}}
+\end{figure}
+
+
+
+%
+%\section{Symbols}\label{sec:symbols}
+%
+%In \symbolist terminology, a ``\textit{symbol}'' is object that connects the semantic and graphic aspects together as a multifaceted unit.
+%Each \textit{symbol} is defined as a \textit{class} of object, which specifies the symbol's data structure and UI interaction, and data mapping to different representational contexts.
+
+\section{Semantic Representation}\label{sec:semantic}
+
+Within the \symbolist application, semantic data is stored as Javascript objects, and read/written in JSON\footnote{https://www.json.org/json-en.html} format (transcoded to-and-from OSC for inter-application communication).
 
 The main attributes used in \symbolist semantic data objects are:
 
@@ -365,10 +400,12 @@ The main attributes used in \symbolist semantic data objects are:
 \item \textit{contents}: an array of child objects that a parent container object might hold (required for container symbols).
 \end{itemize}
 
-In addition to the required \textit{id} and \textit{class} attributes, symbol objects may include any number of other \textit{attributes}\footnote{The term \textit{attribute} is used here interchangeably with properties, parameters, aspects, etc.} of the symbol (\textit{pitch}, \textit{amplitude}, etc.). For example a simple semantic object written in JSON might look like:
+Semantic data objects may include any number of other attributes\footnote{The term \textit{attribute} is used here interchangeably with properties, parameters, aspects, etc.} (\textit{pitch}, \textit{amplitude}, etc.). 
+For example a simple semantic object might look like:
 
 \begin{lstlisting}[
 belowskip=-2 \baselineskip,
+ language=Javascript,
   mathescape,
   columns=fullflexible,
   breaklines=true,
@@ -383,16 +420,16 @@ belowskip=-2 \baselineskip,
 \end{lstlisting}
 
 \noindent
-Here we see an object with the \textit{id} ``foo,'' which is of \textit{class} type ``legs'', that has an attribute \textit{action} associated with it and a start time.
+Here we see an object with the \textit{id} ``foo,'' which is of \textit{class} ``legs'', that has an attribute \textit{action} associated with it and a start time.
 
-\subsection{Containers}
+\subsection*{Containers}
 Symbols may also contain other symbols. 
-Container symbols function to frame their contents, giving reference and context, like a plot graph frame, which provides a perspective and scaling for interpreting the set of data points displayed in the graph.
-
-When a symbol contains other symbols, the child symbols are stored as an array in the object's \textit{contents} field. For example an imaginary class ``timeline'', which holds two types of leg actions, we might write something like:
+Container symbols function to frame their contents, providing reference and context, like a plot graph frame, which provides a perspective and scaling for interpreting the set of data points displayed in the graph.
+Similarly, when a semantic data object contains other objects, the children are stored as an array in the object's \textit{contents} field. For example an imaginary class ``timeline'', which holds two types of leg actions, we might write something like:
 
 \begin{lstlisting}[
 belowskip=-2 \baselineskip,
+ language=Javascript,
   mathescape,
   columns=fullflexible,
   breaklines=true,
@@ -417,14 +454,15 @@ belowskip=-2 \baselineskip,
 
 \end{lstlisting}
 
-% move this to the definitions discussion?
-In most cases, a symbol's mapping definition will require querying its parent symbol for information, in order to plot its data relative to the container context, for example offsetting the screen coordinate position based on the parent object position.
+% move this to the definitions discussion? (already there I think)
+%In most cases, a symbol's mapping definition will require querying its parent symbol for information, in order to plot its data relative to the container context, for example offsetting the screen coordinate position based on the parent object position.
 
-\section{Score File Format}\label{sec:score}
+\subsection*{Score Files}\label{sec:score}
 
-Using symbols and symbol containers, we can create tree structures which can be used to represent hierarchical grouping; to represent scores, or other types of data structures.
-At the root of the tree structure is a top-level symbol, which might (but not necessarily) define behavior of its children objects.
-Since the data elements are stored in js objects, it is easy to import/export \symbolist scores as JSON files.
+%Using objects and container objects, we can form tree structures to represent hierarchical grouping.
+%At the root of the tree structure is a top-level object, which might (but not necessarily) define behavior of its children objects.
+
+Since the data elements are stored as JS objects, it is easy to import/export \symbolist scores as JSON files.
 
 When the application loads, it reads a default initialization file, in the form of a \symbolist score.
 The current default initialization config file looks like this:
@@ -442,8 +480,6 @@ belowskip=-2 \baselineskip,
     "about" : "some metatdata",
     "id" : "Score",
     "class" : "RootSymbol",
-    "tools" : [],
-    "palette" : ["SubdivisionTool", "BasicSymbolGL"],
     "contents": { 
         "id" : "trio",
         "class" : "SystemContainer",
@@ -455,7 +491,6 @@ belowskip=-2 \baselineskip,
             "id" : "oboe",
             "class" : "FiveLineStave",
             "height" : 100,
-            "lineSpacing" : 10,
             "duration": 20,
             "time": 0,
             "contents" : []
@@ -481,21 +516,21 @@ belowskip=-2 \baselineskip,
 \end{lstlisting}
 \end{minipage}
 
-The initialization file is literally a score object file, providing the default context for a given authoring situation. In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbol (which are all actually containers as well, initialized as empty arrays). The \textit{palette} and \textit{tools} attributes tell the application to provide access to certain tools, and child symbols in the GUI.
+In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbols.
 
-\section{Graphic Display Format}\label{graphic_display_format}
+\section{Browser Notation}\label{sec:graphic_display_format}
 
-The graphic representation of the data in \symbolist uses SVG format, and and follows the same hierarchical structure of the data as found in the semantic data score object.
-Since the new version of \symbolist uses a browser as a frontend, we are able to take advantage of the many standard tools and web functionalities provided by browsers for display, interaction and data management.
+\symbolist uses SVG to draw graphic symbol representation, utilizing \drawsocket as a convenience wrapper to provide shorthand methods to create and manipulating browser window elements. 
 
-Like the JSON score initialization file above, the main application window is setup using HTML/CSS, and utilizing \drawsocket as a convenience wrapper to provide shorthand methods to create and manipulating browser window elements. 
+\subsection*{SVG / HTML Format}
 
-\subsection{SVG}
+The \symbolist format for a \textit{symbol} in its browser-rendered notation, is a set of three group elements ($<$g$>$ in SVG, or $<$div$>$ in HTML) marked by \textit{class} tags, which follow the defined symbol class name.
 
-The \symbolist format for an SVG \textit{symbol} is a one top group ($<$g$>$) elements, with two sub-groups for \textit{display} and \textit{contents}, using HTML/CSS class names. The most simple SVG symbol would be:
+For a symbol class type ``SymbolClassName'', the SVG template would be:
 
 \begin{lstlisting}[
 belowskip=-2 \baselineskip,
+ language=Javascript,
 mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
 <g  id="foo" class="SymbolClassName symbol">
     <g class="SymbolClassName display"></g>
@@ -503,49 +538,49 @@ mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfa
 </g>
 \end{lstlisting}
 
+The ``\textit{symbol}'' class marks the top-level symbol group containing the ``\textit{display}'' and ``\textit{contents}'' groups. The ``\textit{display}'' group holds all of the symbol's display information, and the ``\textit{contents}'' group for any potential child elements. 
+For simplicity all graphic \textit{symbol} elements include both the \textit{display} and \textit{contents} elements as placeholders.
 
-Just like the semantic data objects, graphics objects have required \textit{id} and \textit{class} parameters, with an optional \textit{contents} element.
+%Symbols and containers can also be HTML elements instead of SVG. In the case of HTML you would use $<$div$>$ instead of $<$g$>$ tags for the symbol elements.
 
-Each symbol grouping element is tagged using class names, following the symbol's unique class name (in this example ``SymbolClassName''). Note that the order is important: \textit{the symbol class type must be first}. The \textit{symbol} tag marks the top-level grouping object of the symbol, the \textit{display} element is a group that holds all of this symbol's visual display information, and the \textit{contents} is an group object for holding any potential child elements. Note that for simplicity, all \symbolist graphic elements include the \textit{contents} element as a placeholder.
-
-\subsection{HTML}
-
-Symbols and containers could also potentially be HTML elements instead of SVG. In the case of HTML you would use $<$div$>$ tags instead of SVG $<$g$>$:
-html:
-
-\begin{lstlisting}[
-belowskip=-2 \baselineskip,
-  mathescape,
-  columns=fullflexible,
-  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
-]
-<div class="SymbolClassName symbol">
-    <div class="SymbolClassName display"></div>
-    <div class="SymbolClassName contents"></div>
-</div>
-\end{lstlisting}
+%\begin{lstlisting}[
+%belowskip=-2 \baselineskip,
+% language=Javascript,
+%  mathescape,
+%  columns=fullflexible,
+%  basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont,
+%]
+%<div id="bar" class="SymbolClassName symbol">
+%    <div class="SymbolClassName display"></div>
+%    <div class="SymbolClassName contents"></div>
+%</div>
+%\end{lstlisting}
 
 
-\subsection{dataset-elements}\label{sec:dataset}
+\subsection*{Storing Semantic Data in Dataset Attributes}\label{sec:dataset}
 
-Since \symbolist is constantly mapping to and from semantic data and its graphic representation, we are using the HTML \textit{dataset} feature\footnote{https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset} to store the semantic data inside the top-level \textit{symbol} element ($<$g$>$ or $<$div$>$).
-The HTML dataset attributes use the prefix ``\textit{data-}''.\footnote{Note that according to the HTML dataset specifications, all names will be converted to lowercase, this can create issues in some cases, so best practice is to use all lowercase for attribute names.}
+Since \symbolist is constantly mapping back and forth between semantic data and its graphic representation, we are making use of the HTML \textit{dataset} feature\footnote{https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset} to store the semantic metadata inside the top-level \textit{symbol} element.
 
-For example, mapping our imaginary ``legs'' actions above, the corresponding SVG objects would be (skipping the actual display drawing for now):
+For example, using our imaginary ``legs'' actions above, we include the \textit{action} and \textit{start\_time} parameters, written as dataset attributes by using the prefix ``\textit{data-}'':\footnote{Note that according to the HTML dataset specifications, all names will be converted to lowercase, this can create issues in some cases, so best practice is to use all lowercase for attribute names.}
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=Javascript,
 belowskip=-2 \baselineskip,
 %float=*,
 mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfamily{lmvtt}\selectfont]
-<g  id="bar" class="Timeline symbol" data-duration="1">
+<g  id="bar" class="Timeline symbol" 
+							data-duration="1">
   <g class="Timeline display"></g>
   <g class="Timeline contents">
-      <g  id="foo-1" class="Legs symbol" data-action="jump" data-start_time="0.1">
+      <g  id="foo-1" class="Legs symbol" 
+      						data-action="jump" 
+      						data-start_time="0.1">
         <g class="Legs display"></g>
         <g class="Legs contents"></g>
       </g>
-      <g  id="foo-2" class="Legs symbol" data-action="sit" data-start_time="0.2">
+      <g  id="foo-2" class="Legs symbol" 
+      						data-action="sit" 
+      						data-start_time="0.2">
         <g class="Legs display"></g>
         <g class="Legs contents"></g>
       </g>
@@ -555,71 +590,44 @@ mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfa
 \end{minipage}
 
 
+%
+%
+%\section{Performing Data}
+%
+%Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also expressed as control data in connection with other media forms. 
+%For example, a ``\textit{note}'' object's pitch, onset, and duration information could be used to trigger a note on a synthesizer; or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
+%
+%\symbolist provides several options for sorting and looking up data (Figure~\ref{fig:score-lookup}), which can be used as a means to ``perform'' of score.
+%
+%Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author.
 
 
-\section{Performing Data}
+%%In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
 
-Just as the \textit{graphic representation} can be seen as a visual expression of \textit{semantic data}, the same semantic data can also used as control data in connection with other media forms. For example, a \textit{note} object's pitch, onset, and duration information could be used to trigger a note on a synthesizer, or a sequence of Labanotation~\cite{guest2014labanotation} could be used to guide the movement of robotic motors, create haptic feedback for live performance~\cite{west2019design}, and so on. 
-
-\symbolist provides several different options for sorting and looking up data (see Figure~\ref{fig:score-lookup}), which can serve as a structure for the performance of a ``score'', or other data formats. Typically, some representation of time is used to indicate an object's moment of action, but in \symbolist the exact nature of the temporal organization is up to to the author.
-
-In addition to the \textit{semantic} and \textit{graphic} contexts of data representation, we can think of the \textit{performance} of the data as a third data context context.
-
-\section{Mapping}\label{sec:mapping}
-
-Between each of these representation contexts there is a layer of mapping, with the \textit{semantic data} serving as the primary representation type. 
-
-\textit{Semantic data to graphic representation} mapping (Figure~\ref{fig:data-to-graphic}) is used for the creation of graphic symbols from a stream of input, for example from generative processes, textural authoring, or computer assisted composition systems~\cite{bresson2011om, didkovsky2008maxscore, agostini2015max, baca2015abjad, burloiu2017visual}.
-
-\textit{Graphic representation to semantic data} mapping (Figure~\ref{fig:graphic-to-data}) is used in order to create or edit data based on graphic information. This is the typical ``graphical user interface'' situation, where the data is accessible through its visual representation.
-
-\textit{Semantic data to performance media} mapping (Figure~\ref{fig:score-lookup}) is the use of the data as a sequence of events that can be played in time (or used to control other processes not necessarily in time).
-
-Note that in \symbolist mapping between \textit{performance media} and \textit{graphic representation} is achieved through first mapping to semantic data. See section~\ref{library_definitions_api} for further discussion.
-
-
-% mapping figures
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.9\columnwidth]{data-to-graphic.pdf}
-\caption{\textit{semantic data} mapped to create a \textit{graphic} representation from input data.
-\label{fig:data-to-graphic}}
-\end{figure}
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.9\columnwidth]{graphic-to-data.pdf}
-\caption{If edited graphically, the updated graphic data is then mapped back to \textit{semantic data} representation. 
-\label{fig:graphic-to-data}}
-\end{figure}
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=1\columnwidth]{score-lookup.pdf}
-\caption{Using the lookup method defined by the symbol class, the \textit{semantic data} can be used to perform external instruments via Open Sound Control. 
-\label{fig:score-lookup}}
-\end{figure}
 
 \section{Symbol Definitions}\label{library_definitions_api}
 %Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
 
 Symbols are defined as Javascript classes which are stored and recalled when symbol actions are performed. 
-For each user interaction, the ui- and io-controllers looks up the symbols involved in the interaction, and uses their definitions to enact the symbol's reaction. 
-Definitions define the mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
-Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation structure needed to address a given use-case scenario.
-%Definitions allow for custom graphical user interaction for each type of symbol, and are used to define mapping relationships between the symbol's \textit{semantic}, \textit{graphic}, and output \textit{performance} data.
+For each user interaction, the ui- and io-controllers look up the symbols involved in the interaction by class name, and use their definition to execute the symbol's reaction. 
+Definitions specify the bi-directional mapping between \textit{semantic} and \textit{graphic} representations, and OSC response to ``\textit{lookup}'' queries which can be used to perform the score.\footnote{Users can also define mappings in the lookup method to context specific messages, for example synthesis parameters, etc.}
 
-To allow for maximum flexibility of interaction and the creation of context-specific composition environments, each symbol manages its own mouse interaction, triggered by the user's selection in the palette toolbar. 
-In order to streamline the process of writing new symbol definitions there is a template base class that handles most common interaction situations, which can be redefined and overwritten by sub-classes. Eventually it is planned to provide a UI in the editor for defining a mapping definition graphically, but this is not yet implemented.
+%Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation structure needed to address a given use-case scenario.
 
+%To allow for maximum flexibility of interaction and the creation of context-specific composition environments, each symbol manages its own mouse interaction, triggered by the user's selection in the palette toolbar. 
+
+%\subsection*{UI and IO definitions}
 There are two types of definition scripts:
 \begin{itemize}\itemsep0pt 
-\item \textit{ui-definitions} run in the \uicontroller and perform user interactions based on the different interaction modes described above, and apply bidirectional mapping between semantic data representation and graphic representation in the browser.
-\item \textit{io-definitions} run in the \iocontroller and are used to assist in the lookup and \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
+\item \textit{ui-definitions} run in the \uicontroller and perform user interactions based on the different interaction modes and applies bidirectional mapping between semantic and graphic representations.
+\item \textit{io-definitions} run in the \iocontroller and are used to assist in the lookup and OSC \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
 \end{itemize}
 
 In each controller context there are certain methods and variables that need to be defined in order for the class to function properly in the \symbolist ecosystem.
+For convenience, there is a base class template that can be used to handle most common interaction situations, which may be overridden by sub-classes for custom handlers.
+A set of helper functions are provided in global objects called ``\uiapi'' and ``\ioapi'' which can be used in definitions for many essential operations.
+Eventually it is planned to create a graphical tool in the editor to help define symbol definitions, but this is not yet implemented.
+
 
 %Currently, the system uses the same .js file to hold both the `ui` and `io` definitions. To aid in development there is a template file that can be used to handle most of the most common actions.
 
@@ -640,34 +648,36 @@ In each controller context there are certain methods and variables that need to 
 %Updates sent from the \iocontroller to the UI can be as simple as sending a new score which will trigger a redrawing of the graphics in the UI view. 
 %Updates from graphic user interaction require mapping from the graphic to semantic representation, which is handled in the browser. Any changes are sent back to the \iocontroller where the new semantic values are updated in the \textit{model} (which automatically update the \textit{score}, since both objects hold JS references to the same JS objects).
 %
-\subsection*{API Functions}\label{sec:api_functions}
 
-In each controller context, there are a set of helper functions for use by symbol definitions stored in global objects called \uiapi and \ioapi, which provide many essential operations.
+%\subsection*{API Functions}\label{sec:api_functions}
+
 
 \section{UI Definitions}\label{sec:ui_callbacks}
 
 At the time of writing, the variables and methods defined in the symbol class referred to by the \uicontroller are:
 
 \begin{itemize}\itemsep0pt 
-\item \textit{class}: the unique name of the symbol, used to store and lookup the symbol definition in the \uicontroller.
+\item \textit{class}: the unique name of the symbol, used to store and lookup the symbol definition.
 
-\item \textit{palette}: in the case of container symbols, an array of class names of other symbols that can be used within this container, which are drawn in the palette toolbar when the user selects a symbol as a new context.
+\item \textit{palette}: an array of class names of other symbols that can be used within a container symbol, which are drawn in the palette toolbar when the user selects the symbol as a new context.
 
-\item \textit{getPaletteIcon}: called when drawing the palette for a given container; returns an icon for display in the palette toolbar, using \drawsocket format.
+\item \textit{getPaletteIcon}: called when drawing the palette icon, returns \drawsocket drawing commands.
 
-\item \textit{paletteSelected}: called when the user clicks on the palette icon for this symbol, used to trigger custom UI. When the symbol is selected in the palette, the definition should enable its mouse handers. For creating new symbols from mouse data (currently \textit{cmd-click} is the convention).
+\item \textit{paletteSelected}: called when the user clicks on the symbol icon, used to trigger custom UI. When the symbol is selected in the palette, the definition should enable its mouse handers. 
+%For creating new symbols from mouse data (currently \textit{cmd-click} is the convention).
 
-\item \textit{getInfoDisplay}: called when creating the inspector window; returns drawing commands for the inspector contextual menu, for convenience \uiapi provides a function called \textit{makeDefaultInfoDisplay} which can be used in most cases.
+\item \textit{getInfoDisplay}: called when creating the inspector window; returns drawing commands for the inspector contextual menu.
+%, for convenience \uiapi provides a function called \textit{makeDefaultInfoDisplay} which can be used in most cases.
 
-\item \textit{fromData}: called when data is should be mapped to graphic representation. The definition is responsible for creating the graphic element, normally via \drawsocket, but other approaches are also possible.
+\item \textit{fromData}: called to map data from semantic to graphic representation.
+%Usually this function will call \textit{fromData} to redraw the graphic symbol, and should also send the updated data to the server.
 
-\item \textit{updateFromDataset}: called from the inspector when elements of the data should be updated. Usually this function will call \textit{fromData} to redraw the graphic symbol, and should also send the updated data to the server.
+\item \textit{selected}: called on selection and deselection, for optional custom UI handling.
 
-\item \textit{selected}: called on selection and deselection, return true if selection is handled in the script, returning false (or no return) will trigger the default selection mechanics by the \uicontroller.
+\item \textit{drag}: called when the user drags selected symbols; by default the \uiapi \textit{translate} function is used to set the symbol's SVG translation matrix to preview the new location.
 
-\item \textit{drag}: called from \uicontroller when the user drags selected symbols. For best results, the use the \uiapi \textit{translate} function to set the symbol's SVG translation matrix, but do not apply the translation until mouse up to avoid incremental state changes to score.
-
-\item \textit{applyTransformToData}: called on mouse-up if selected objects have changed. Definition should then apply the transform matrix to the SVG attribute values. This is important because the attribute values not the translation matrix are used for mapping. The \uiapi helper function \textit{applyTransform} is provided for convenience.
+\item \textit{applyTransformToData}: called on mouse-up if selected objects have changed, and applies the transform matrix to the SVG attribute values. 
+%This is important because the attribute values not the translation matrix are used for mapping. The \uiapi helper function \textit{applyTransform} is provided for convenience.
 
 \item \textit{currentContext}: called when the user enters or exits a container symbol (hitting the [s] key, [esc] to exit).
 
@@ -676,33 +686,42 @@ At the time of writing, the variables and methods defined in the symbol class re
 
 \subsection{Data and View Parameters}\label{sec:view-parameters}
 
-Probably the most important elements of the symbol definition is the bi-directional mapping between semantic and graphic forms.
+%The most important element of the symbol definition is the bi-directional mapping between semantic and graphic forms.
  
 Looking at Figures~\ref{fig:data-to-graphic} and \ref{fig:graphic-to-data} we can see that in some cases the relationship between a semantic property and its graphic representation is not a one-to-one mapping.
-For instance in Figure~\ref{fig:data-to-graphic} the \textit{note} property needs to be mapped to a pixel position that is used for both the center point of a graphic circle (note-head) as well as the starting point for a line (duration indication).
-In reverse, Figure~\ref{fig:graphic-to-data} shows how when the user moves a symbol graphically, the new pixel positions need to be translated back into semantic data in order to update the score.
-This can get somewhat complex in cases of nonlinear mappings and hierarchical data structures.
+For instance in Figure~\ref{fig:data-to-graphic} the \textit{note} property needs to be mapped to a pixel position that is used both for the center point of a graphic circle (note-head) as well as the starting point for a line (duration indication).
+In reverse, Figure~\ref{fig:graphic-to-data} shows how when the user moves a symbol \textit{graphically}, the new pixel positions need to be translated back to its semantic representation to update the score.
+%This can get somewhat complex in cases of nonlinear mappings and hierarchical data structures.
 
-In order to manage the mapping between semantic and display representation, the template base class uses an intermediate mapping stage called \textit{view-parameters}.
-The idea is that the \textit{view-parameter} stage contains the bare-minimum number of variables needed to draw the symbol.
+To manage the bi-directional mapping between semantic and display representation, the template base class uses an intermediate  stage called ``\textit{view-parameters}''.
+The idea is that the \textit{view-parameters} contain the bare-minimum number of variables needed to draw the symbol.
 
-For example, in Figure~\ref{fig:data-to-graphic} the graphic representation requires a \textit{y} position relative to the pitch, an \textit{x} position relative to the start time, and a \textit{width} value relative to the duration of the event (the amplitude is not displayed).
-After first mapping from the semantic attributes \textit{note}, \textit{start-time} and \textit{duration} to view-parameters \textit{x}, \textit{y}, and \textit{width}, the drawing method can then use the \textit{x}, \textit{y}, and \textit{width} values to draw its two graphic objects from the reduced set of view-parameters values.
+For example, in Figure~\ref{fig:data-to-graphic} the graphic representation requires a \textit{y} position relative to the pitch's location in the staff, an \textit{x} position relative to the start time, and a \textit{width} value relative to the duration of the event.
+After first mapping from the semantic attributes \textit{note}, \textit{start-time} and \textit{duration} to view-parameters \textit{x}, \textit{y}, and \textit{width}, the drawing method can then use the view-parameters \textit{x}, \textit{y}, and \textit{width} values to draw its two graphic objects from a single set of values.
 
-The ui template class uses two functions to define data-view mappings: \textit{dataToViewParams} which receives the semantic data object and returns the view-parameter object, and \textit{viewParamsToData} which performs the opposite mapping.
-Note that in many cases the \textit{viewParamsToData} function needs only one aspect of the graphic to map back to semantic data. In the example shown in Figure~\ref{fig:graphic-to-data}, the mapping only really needs either the center point of the note-head or the start-x position of the line to determine the \textit{start-time} parameter.
+The ui template class uses two functions to define data-view mappings: \textit{dataToViewParams} which receives the semantic data and returns the view-parameter object, and \textit{viewParamsToData} which performs the opposite mapping.
+Just as the view-parameters provide a minimal set of variables needed to draw multiple graphic graphic objects from the semantic representation, the \textit{viewParamsToData} function uses the same view-parameters to map back to semantic data.
+%in many cases the \textit{viewParamsToData} function needs only one aspect of the graphic to map back to semantic data.
+For example, in Figure~\ref{fig:graphic-to-data} the mapping only needs either the center point of the note-head or the start-x position of the line to determine the \textit{start-time} parameter.
 
 The template class also two additional data/view parameter translation methods to coordinate child objects with parent containers: \textit{childDataToViewParams} and \textit{childViewParamsToData}.
-For example, in Figures~\ref{fig:data-to-graphic} a note-head circle is drawn from its \textit{note} parameter, in coordination with a five-line staff.
-Like a plot graph, the \textit{staff} is a container symbol which defines how we interpret the elements written on its lines. 
-In this case, the symbol definition for the \textit{staff} has a \textit{childDataToViewParams} function is called by the action of the child symbol. 
-The \textit{childDataToViewParams} receives the child data object, as well as the graphic element of a particular staff (which was selected by the user pressing the [s] key). Given its placement on the screen and its own data parameters (number of lines, clef, etc.) the staff's \textit{childDataToViewParams} function will return the view parameters for the child, mapped in relationship to the container object.
-Similarly, when the graphic object is moved, the child object will call the parent's \textit{childViewParamsToData} function to assist with mapping back to semantic data format.
+For example, in Figures~\ref{fig:data-to-graphic} a note-head circle is drawn from its \textit{note} parameter, whose position is relative to the parent five-line staff object. 
+Inside the \textit{note}'s \textit{dataToViewParams} and \textit{viewParamsToData} methods, it will need to ``ask'' its parent objects where to place itself by calling the parent's \textit{childDataToViewParams} and \textit{childViewParamsToData} functions.
+In deeply hierarchical container structures, it is possible that the parent may need to ask \textit{its} parent for some data as well, and so the parent querying system can provide a way to maintain separation of concerns between different aspects of the notation.
+
+%
+%Like a plot graph, the \textit{staff} is a container symbol which defines how we interpret the elements written on its lines.
+%
+%
+%In this case, the symbol definition for the staff has a \textit{childDataToViewParams} function which is called by the action of the child symbol. 
+%
+%The \textit{childDataToViewParams} receives the child data object, as well as the graphic element of a particular staff (which was selected by the user pressing the [s] key). Given its placement on the screen and its own data parameters (number of lines, clef, etc.) the staff's \textit{childDataToViewParams} function will return the view parameters for the child, mapped in relationship to the container object.
+%Similarly, when the graphic object is moved, the child object will call the parent's \textit{childViewParamsToData} function to assist with mapping back to semantic data format.
 
 
 \section{IO Definitions}\label{sec:io_definitions}
 
-At the time of writing, the \iocontroller has a much simpler function, which is to handle OSC messages from external applications, score data maintenance, file reading and writing, and responding to external score lookup queries for sequencing.
+The \iocontroller contains functions for handling OSC messages from external applications, score data maintenance, file reading and writing, and responding to external score lookup queries for sequencing.
 Variables and methods currently used by the \iocontroller are:
 
 \begin{itemize}\itemsep0pt 
@@ -767,7 +786,7 @@ Upon receiving an OSC message with the \textit{key} ``data'', the object payload
 
 Received by the \uicontroller, the semantic data then is mapped to graphic data, by looking up the symbol's \textit{class} definition and calling the ui-definition's \textit{fromData} method, which maps from the data representation to the graphic drawing commands. 
 
-As discussed above (in Section~\ref{sec:view-parameters}), when using the symbol template base-class, the \textit{fromData} method will usually call the symbol's internal \textit{dataToViewParams} which performs the mapping from semantic to a minimal set of graphic values which are then used to draw the graphics, by sending drawing commands to \drawsocket accessed through the \uiapi, including the HTML dataset storage, as described above (in Section~\ref{graphic_display_format}).
+As discussed above (in Section~\ref{sec:view-parameters}), when using the symbol template base-class, the \textit{fromData} method will usually call the symbol's internal \textit{dataToViewParams} which performs the mapping from semantic to a minimal set of graphic values which are then used to draw the graphics, by sending drawing commands to \drawsocket accessed through the \uiapi, including the HTML dataset storage, as described above (in Section~\ref{sec:graphic_display_format}).
 
 A typical drawing command would look something like:
 %1. send the drawing commands to the browser display (via \drawsocket usually, using the `drawsocketInput` API method). Include the data content into the symbol by using the HTML `dataset` (you can use `ui\_api.dataToHTML(dataObj)` helper function to create the `data-` tags)
