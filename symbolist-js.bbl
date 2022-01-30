@@ -26,7 +26,7 @@ M.~Wright, ``{Open Sound Control: an enabling technology for musical
   networking},'' \emph{Organised Sound}, vol.~10, no.~3, pp. 193--200, 2005.
 
 \bibitem{maccallum2015dynamic}
-J.~MacCallum, R.~Gottfried, I.~Rostovtsev, J.~Bresson, and A.~Freed, ``{Dynamic
+J.~MacCallum, X.~XXXX, I.~Rostovtsev, J.~Bresson, and A.~Freed, ``{Dynamic
   Message-Oriented Middleware with Open Sound Control and Odot},'' in
   \emph{{Proceedings of the International Computer Music Conference
   (ICMC'15)}}, Denton, TX, USA, 2015.
@@ -40,12 +40,12 @@ G.~Marino, M.-H. Serra, and J.-M. Raczinski, ``The upic system: Origins and
   innovations,'' \emph{Perspectives of New Music}, pp. 258--269, 1993.
 
 \bibitem{gottfried2013studies}
-R.~Gottfried, ``{Studies on the Compositional Use of Space},'' IRCAM, Paris,
-  France, Tech. Rep., 2013.
+XXXXXXX, ``{Studies on the Compositional Use of Space},'' IRCAM, Paris, France,
+  Tech. Rep., 2013.
 
 \bibitem{gottfried2015svg}
-------, ``{SVG to OSC Transcoding: Towards a Platform for Notational Praxis and
-  Electronic Performance},'' in \emph{{Proceedings of the International
+XXXXXXXX, ``{SVG to OSC Transcoding: Towards a Platform for Notational Praxis
+  and Electronic Performance},'' in \emph{{Proceedings of the International
   Conference on Technologies for Notation and Representation (TENOR'15)}},
   Paris, France, 2015.
 
@@ -56,35 +56,24 @@ J.~Bresson, C.~Agon, and G.~Assayag, ``{OpenMusic: Visual Programming
   OpenSource Software Competition}, Scottsdale, AZ, USA, 2011, pp. 743--746.
 
 \bibitem{gottfried2018symbolist}
-R.~Gottfried and J.~Bresson, ``Symbolist: An open authoring environment for
-  end-user symbolic notation,'' in \emph{International Conference on
-  Technologies for Music Notation and Representation (TENOR'18)}, 2018.
+XXXXXXXXXX, ``Symbolist: An open authoring environment for end-user symbolic
+  notation,'' in \emph{International Conference on Technologies for Music
+  Notation and Representation (TENOR'18)}, 2018.
 
 \bibitem{gottfried2019drawsocket}
-R.~Gottfried and G.~Hajdu, ``Drawsocket: A browser based system for networked
-  score display,'' in \emph{Proceedings of the International Conference on
-  Technologies for Music Notation and Representation--TENOR 2019}.\hskip 1em
-  plus 0.5em minus 0.4em\relax Melbourne, Australia: Monash University, 2019,
-  pp. 15--25.
+X.~XXXX, ``Drawsocket: A browser based system for networked score display,'' in
+  \emph{Proceedings of the International Conference on Technologies for Music
+  Notation and Representation--TENOR 2019}.\hskip 1em plus 0.5em minus
+  0.4em\relax Melbourne, Australia: Monash University, 2019, pp. 15--25.
 
 \bibitem{hajdu2005quintet}
 G.~Hajdu, ``Quintet. net: An environment for composing and performing music on
   the internet,'' \emph{Leonardo}, vol.~38, no.~1, pp. 23--30, 2005.
 
 \bibitem{freed2014io}
-A.~Freed, D.~DeFilippo, R.~Gottfried, J.~MacCallum, J.~Lubow, D.~Razo, and
-  D.~Wessel, ``{o.io: a Unified Communications Framework for Music, Intermedia
-  and Cloud Interaction.}'' in \emph{ICMC}, 2014.
-
-\bibitem{guest2014labanotation}
-A.~H. Guest, \emph{Labanotation: The System of Analyzing and Recording
-  Movement}.\hskip 1em plus 0.5em minus 0.4em\relax Routledge, 2005.
-
-\bibitem{west2019design}
-T.~J. West, A.~Bachmayer, S.~Bhagwati, J.~Berzowska, and M.~M. Wanderley, ``The
-  design of the body: suit: score, a full-body vibrotactile musical score,'' in
-  \emph{International Conference on Human-Computer Interaction}.\hskip 1em plus
-  0.5em minus 0.4em\relax Springer, 2019, pp. 70--89.
+A.~Freed, D.~DeFilippo, X.~XXX, J.~MacCallum, J.~Lubow, D.~Razo, and D.~Wessel,
+  ``{o.io: a Unified Communications Framework for Music, Intermedia and Cloud
+  Interaction.}'' in \emph{ICMC}, 2014.
 
 \bibitem{didkovsky2008maxscore}
 N.~Didkovsky and G.~Hajdu, ``{MaxScore: Music Notation in Max/MSP},'' in

@@ -29,8 +29,8 @@
 %\usepackage[font=footnotesize]{subfig}
 
 
-\def\papertitle{Bidirectional graphic-semantic mapping for media notation authoring and performance: Symbolist Re-imagined}
-\def\firstauthor{Rama Gottfried}
+\def\papertitle{Symbolist Re-imagined: bidirectional graphic-semantic mapping for media notation authoring and performance}
+\def\firstauthor{Anonymized} %Rama Gottfried
 %\def\secondauthor{James Tsz-Him Cheung}
 %\def\thirdauthor{Georg Hajdu}
 
@@ -52,13 +52,7 @@
 
 
 %% Depending on the number of authors, set this variable accordingly for the copyright notice:
-% \def\copyrightauthors{Author One}
-\def\copyrightauthors{Rama Gottfried}
-% \def\copyrightauthors{Author One, Author Two et al}
-
-% adds the automatic
-% Saves a lot of output space in PDF... after conversion with the distiller
-% Delete if you cannot get PS fonts working on your system.
+%\def\copyrightauthors{Rama Gottfried}
 
 \def\oscfontsize{\tiny}
 
@@ -121,13 +115,9 @@
 \title{\papertitle}
 
 \oneauthor
-% \threeauthors
-   {\firstauthor} { Hochschule für Music und Theater \\ Hamburg, Germany \\
-     {\tt \href{mailto:rama.gottfried@hfmt-hamburg.de}{rama.gottfried@hfmt-hamburg.de}}}
-% {\secondauthor} {University for Music and Theater \\ Hamburg, Germany  \\ 
-%   {\tt \href{mailto:tsz.him.cheung@hfmt-hamburg.de}{tsz.him.cheung@hfmt-hamburg.de}}} 
-% {\thirdauthor} {University for Music and Theater \\ Hamburg, Germany \\
-%   {\tt \href{mailto:georg.hajdu@hfmt-hamburg.de}{georg.hajdu@hfmt-hamburg.de}}}
+   {\firstauthor} { }
+%   {\firstauthor} { Hochschule für Musik und Theater \\ Hamburg, Germany \\
+%     {\tt \href{mailto:rama.gottfried@hfmt-hamburg.de}{rama.gottfried@hfmt-hamburg.de}}}
 
 
 
@@ -139,22 +129,15 @@
 \capstarttrue
 
 
-% ABSTRACT
-% fill in after finishing the paper
 \begin{abstract}
-  \symbolist is an in-development application for experimental notation, with the goal of creating a working environment for developing symbolic notation for multimedia which can be interpreted and performed by electronics. The program aims to provide an open play space, with tools for experimentation, and thinking visually about relationships between representation and interpretation in media performance. 
 
-The evaluation and re-design of the application based on the need for a bidirectional mapping framework for working with symbolic notation and its corresponding data representations.
-
-In the paper we begin with an overview of the project's background, iterations and relationship to the \drawsocket project, followed by an introduction to the new symbol definition system, and cbidirectionalonclude with a perspective on future development directions.
+\symbolist is an in-development application for experimental notation, which aims to provide an un-opinionated authoring environment for the design and performance of symbolic notation. 
+By following an information visualization rather than prescribed musical orientation, the application is thought of as an open play-space, with tools for experimentation and thinking visually about relationships between representation and interpretation in media performance.
+In the paper we begin with an overview of the project's background, iterations and relationship to the \drawsocket project, and introduce a redesign of the system, centered on a new framework for custom symbol definitions for bidirectional mapping and user interaction.
+In conclusion we discuss future development directions and evaluation of the project.
 
 \end{abstract}
 
-
-% INTRO
-% not sure what should go here, or how in detail to go
-% I guess:
-% why did I make it, what is it, breifly discuss some of the steps
 
 \section{Background}\label{sec:background}
 
@@ -171,58 +154,58 @@ Further, you could also group elements to structure hierarchies of objects which
 
 Around the same time, I was studying at UC Berkeley's Center for New Music and Audio Technologies (CNMAT) developing approaches to instrument design using OpenSoundControl (OSC)~\cite{wright:osc} for data structuring. 
 One day, while working with Scriptographer, I had saved a score in Illustrator as Scalable Vector Graphics (SVG) format~\footnote{https://www.w3.org/TR/SVG11} and accidentally opened the SVG file in a text editor. 
-In the SVG file I noticed that all of the graphic objects where there in a human readable format, and closely resembled the kind of nested objects that we were working on at CNMAT in the Odot library\cite{maccallum2015dynamic}. This gave me the idea that I could maybe translate the SVG information into OSC and then ``perform'' the OSC score in much the same way as you would a stream of OSC coming from a sensor based instrument; in a similar spirit to Daphne Oram's ``Oramics''~\cite{manning2012oramics} and Xenakis' UPIC system~\cite{marino1993upic}, but with a greater focus on symbolic interpretation. 
+In the SVG file I noticed that all of the graphic objects were there in a human readable format, and closely resembled the kind of nested objects that we were working on at CNMAT in the Odot library\cite{maccallum2015dynamic}. This gave me the idea that I might be able to translate the SVG information into OSC, then ``perform'' the OSC score in much the same way as you would a stream of OSC coming from a sensor-based instrument—in a similar spirit to Daphne Oram's ``Oramics''~\cite{manning2012oramics} and Xenakis' UPIC system~\cite{marino1993upic}, but with a greater focus on symbolic interpretation. 
 %The first tests seemed promising, and so I logged it away for possible future use.
 
 Soon after, while composing for a high-resolution spatial audio rendering system, I found that I was lacking a way to compose spatial movements graphically, in a way that would connect with instrumental notation practice.
-After some experiments using Blender\footnote{https://www.blender.org/} to draw 3D curves which could then be parsed via Python and sent out over OSC, I was dissatisfied by the perceptual differences between common practice notation and the kinds of 3D representation I was able to create in Blender; both had their merits, but what was missing was a compositional frame that connected the two representation paradigms into a unified notation system.
-And so due to the time constraints, for this piece I fell back on using automation controls in Ableton Live\footnote{https://www.ableton.com/en/} and sending OSC to control the movements using Max for Live.\footnote{https://cycling74.com/}
-This was practical, but this kind of automation approach, has the limitation of forcing the composer to separate each data parameter into separate streams of data (e.g. $x, y, z$), whereas in a symbolic representation multiple attributes can be indicated in unified graphic representation. 
+After some experiments using Blender\footnote{https://www.blender.org/} to draw 3D curves which could then be parsed via Python and sent out over OSC, I was dissatisfied by the perceptual differences between common practice notation and the kinds of 3D representation I was able to create in Blender—both had their merits, but what was missing was a compositional frame that connected the two representation paradigms into a unified notation system.
+Due to time constraints, for this piece I fell back on using automation controls in Ableton Live\footnote{https://www.ableton.com/en/} and sending OSC to control the movements using Max for Live.\footnote{https://cycling74.com/}
+This was practical, but this kind of automation approach has the limitation of forcing the composer to separate each data parameter into separate streams of data (e.g. $x, y, z$), whereas in a symbolic representation multiple attributes can be indicated in unified graphic representation. 
 Following these experiences~\cite{gottfried2013studies} I later returned to the SVG-OSC transcoding idea, and developed a first working model which was presented at the 2015 TENOR conference~\cite{gottfried2015svg}.
 
 In the meantime, the Scriptographer project was abandoned by its developers after Adobe drastically changed their plugin API in version CS6. 
-The new Adobe API was different enough that it would require a significant amount of work, and even then, the mouse interaction tools that were used in Scriptographer were no longer accessible, and so the authors decided to stop development on the project, and later  went on to create Paper.js;\footnote{http://paperjs.org/} which has some similarities with Scriptographer, but is more closely related to Processing, since it no longer is bound to the Illustrator application environment. 
+The new Adobe API was different enough that it would require a significant amount of work, and even then the mouse interaction tools that were used in Scriptographer were no longer accessible, so the authors decided to stop development on the project and later went on to create Paper.js,\footnote{http://paperjs.org/} which has some similarities with Scriptographer, but is more closely related to Processing since it no longer is bound to the Illustrator application environment. 
 
 %This created a stumbling block for the SVG-OSC work, since it relied on Scriptographer and its link to Illustrator as primary tools for the creation of easy to print scores for musicians to perform with. 
 
 \subsection*{Symbolist JUCE}\label{sec:juce_version}
 
-After preliminary tests using the SVG-OSC transcoding for score playback, it was becoming increasingly complicated to parse complex hierarchies of symbols in order to format them into OSC streams, and so in 2017 I began work in collaboration with OpenMusic~\cite{bresson2011om} developer Jean Bresson, through a Ircam-ZKM Musical Research Residency towards the goal of creating a system that could replace the Scriptographer/Illustrator approach that I had developed so far.
+After preliminary tests using the SVG-OSC transcoding for score playback, it was becoming increasingly complicated to parse complex hierarchies of symbols in order to format them into OSC streams, so in 2017 I began work in collaboration with OpenMusic~\cite{bresson2011om} developer Jean Bresson, through an Ircam-ZKM Musical Research Residency towards the goal of creating a system that could replace the Scriptographer/Illustrator approach that I had developed so far.
 
-The first version of \symbolist was created in 2018 as a standalone JUCE\footnote{https://juce.com/} application, which provided the basic tools for drawing vector graphics, and query system that allowed \symbolist to be used as a lookup table for OSC stream playback~\cite{gottfried2018symbolist}.
+The first version of \symbolist was created in 2018 as a standalone JUCE\footnote{https://juce.com/} application, which provided the basic tools for drawing vector graphics and query system that allowed \symbolist to be used as a lookup table for OSC stream playback~\cite{gottfried2018symbolist}.
 
-Working in JUCE seemed practical since it has a wide user base, and is used for audio plugins as well as Max and Ableton Live applications,
+Working in JUCE seemed practical since it has a wide user base and is used for audio plugins as well as Max and Ableton Live applications.
 There were some minor complications, due to JUCE's incomplete SVG support,\footnote{https://forum.juce.com/t/complex-svg-files-fail-to-load-properly/26917/16} however, generally, we were able to create a working first prototype of the system.
 
 \subsection*{Clefs and Bidirectional Mapping}\label{sec:bidirectional_mapping}
 
-A conceptual turning point in the project occurred towards the end of residency as we were thinking about how to simplify the process of using the SVG data for controlling digital processes.
+A conceptual turning point in the project occurred towards the end of the residency as we were thinking about how to simplify the process of using the SVG data for controlling digital processes.
 
 In the first version of \symbolist, as in the original SVG-OSC implementation, the graphic data needed to be interpreted by the application that received the data. 
-Using Odot I would parse the graphic OSC information coming in from \symbolist, and then map the data to other processes, for instance synthesis parameters, or coordinates for spatial rendering. 
+Using Odot I would parse the graphic OSC information coming in from \symbolist, and then map the data to other processes, for instance synthesis parameters or coordinates for spatial rendering. 
 
 The process of interpretation requires that the parsing-mapping algorithm knows the context of the graphic objects. For example, that a circle is a note-head and not a rhythmic dot, and so on. 
-Like the axes of a graphic plot of information, contextual musical symbols---meter, staff-lines, clefs.---indicate to the reader how they should interpret the notes and rhythmic symbols written on the staff.
+Like the axes of a graphic plot of information, contextual musical symbols (meter, staff-lines, clefs) indicate to the reader how they should interpret the notes and rhythmic symbols written on the staff.
 
 The following phase of \symbolist development continued as I began work at the Hamburg University of Music and Theater, working with Georg Hajdu in the Innovative Hochschule project. 
 Continuing from the idea of the \textit{clef} as a graphic symbol that contextualizes the notation on a musical staff, I began work on developing a system for \symbolist that would allow users to define interpretive symbols for hierarchical context parsing.
 Since the data is already in hierarchical format inside the application's data structure, it was logical that \symbolist could interpret the graphics internally, and then stream OSC post parsing and mapping, rather than streaming the raw graphic information which required complex parsing of the graphic hierarchies to contextualize the symbol references, as in traditional common practice notation.
 
-Following this line of thought, it became clear that what \symbolist really needed was a system for \textit{bidirectional mapping}, where graphic data is interpreted as symbolic data with semantic meaning, and inversely, that the user should also be able to send data in its semantic representation to \symbolist, where it would be then mapped to its graphic representation.
+Following this line of thought it became clear that what \symbolist really needed was a system for \textit{bidirectional mapping}, where graphic data is interpreted as symbolic data with semantic meaning, and inversely, that the user should also be able to send data in its semantic representation to \symbolist, where it would then be mapped to its graphic representation.
 
 In 2018 I began implementing this idea into the JUCE version of \symbolist, but soon needed to switch tracks to focus on a different notation issue for a project at the Innovative Hochschule, developing a platform for realtime networked score display.
 
 \subsection*{Drawsocket and Symbolist JS}\label{sec:drawsocket}
 
-At the end of 2018, and first half of 2019 we developed a \drawsocket, a server/client framework for realtime dynamic notation, using web-browsers for graphic rendering~\cite{gottfried2019drawsocket, hajdu2005quintet}. 
-Based in node.js and standard web technologies of HTML, SVG, CSS, and Javascript, \drawsocket is essentially an OSC wrapper~\cite{freed2014io} for web-browsers,\footnote{And by extension, provides access to other media via WebAudio, WebGL, etc.} providing a homogeneous message API for the creation and realtime manipulation of browser elements.
+At the end of 2018, and first half of 2019 we developed a drawsocket, a server/client framework for realtime dynamic notation using web browsers for graphic rendering~\cite{gottfried2019drawsocket, hajdu2005quintet}. 
+Based in node.js and standard web technologies of HTML, SVG, CSS, and Javascript, \drawsocket is essentially an OSC wrapper~\cite{freed2014io} for web browsers,\footnote{And by extension, provides access to other media via WebAudio, WebGL, etc.} providing a homogeneous message API for the creation and realtime manipulation of browser elements.
 
-Returning to \symbolist after the first \drawsocket concerts, I began wondering if the framework of \symbolist needed to be re-designed from the prospective of bidirectional mapping, since I realized that this was most likely going to be the most important part of the graphic-data relationship that the system is developing towards. 
+Returning to \symbolist after the first \drawsocket concerts, I began wondering if the framework of \symbolist needed to be redesigned from the perspective of bidirectional mapping, since I realized that this was most likely going to be the most important part of the graphic-data relationship that the system is developing towards. 
 
-SVG is very well supported in modern browsers, and having just worked with node.js and browser technologies for \drawsocket, it seemed that the flexibility of Javascript could be a convenient option for users to create custom symbol definitions (as in Scriptographer), and so I decided to see how fast it would be to implement a proof of concept using Electron.js,\footnote{https://www.electronjs.org/} a cross-platform desktop application development, using a node.js sever and Chrome as a front-end, used for applications like Skype, WhatsApp, Visual Studio Code, Slack, WordPress, and others.
+SVG is very well supported in modern browsers, and having just worked with node.js and browser technologies for \drawsocket, it seemed that the flexibility of Javascript could be a convenient option for users to create custom symbol definitions (as in Scriptographer). I decided to see how fast it would be to implement a proof of concept using Electron.js,\footnote{https://www.electronjs.org/} a cross-platform desktop application development using a node.js sever and Chrome as a front-end, used for applications like Skype, WhatsApp, Visual Studio Code, Slack, WordPress, and others.
 %While developing \drawsocket, I did some study into frameworks such like React\footnote{https://reactjs.org/} which provide object oriented ways of handling graphic interfaces, not unlike the approaches used in JUCE, however after working in JUCE, I wanted something lightweight and simple to start with.
 
-Using \drawsocket as a frontend, and node.js for the backend I found that I was able to get up and running very quickly with Electron, and so decided to continue \symbolist development in this direction, bringing the experience gained from the JUCE version to the creation of a deeper structure for the creation of symbol interpretations that integrate into the graphic manipulation of symbolic data. 
+Using \drawsocket as a frontend, and node.js for the backend I found that I was able to get up and running very quickly with Electron, and decided to continue \symbolist development in this direction, bringing the experience gained from the JUCE version to the creation of a deeper structure for the creation of symbol interpretations that integrate into the graphic manipulation of symbolic data. 
 
 % screenshot
 \begin{figure*}[hbt!]
@@ -255,9 +238,9 @@ The new implementation of \symbolist is organized as a server-client model (Figu
 \begin{itemize}\itemsep0pt 
 
 \item The main \symbolist application server, running in node.js, which serves the main display page and manages messages between the client and server via WebSocket\footnote{https://websockets.spec.whatwg.org} connection. 
-Within the main server, a child process called the ``\iocontroller''  handles input and output from external sources via OSC over a UDP socket, and maintains the ``\textit{score}'', a database of hierarchical score elements, stored in \symbolist ``\textit{semantic representation}'' format (Section \ref{sec:representation}).
+Within the main server, a child process called the ``\iocontroller''  handles input and output from external sources via OSC over a UDP socket, and maintains the ``\textit{score},'' a database of hierarchical score elements, stored in \symbolist ``\textit{semantic representation}'' format (Section \ref{sec:representation}).
 
-\item The ``\textit{editor},'' a browser-based user interface client which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The ``\uicontroller'' runs in the browser, and handles interaction via a library of definition scripts which specify mappings to and from data and graphics formats, as well as other tools and interactions.
+\item The ``\textit{editor},'' a browser-based user interface client, which displays the graphic representation of the data, and allows the user to edit and create new data objects through graphic interaction. The ``\uicontroller'' runs in the browser and handles interaction via a library of definition scripts, which specify mappings to and from data and graphics formats, as well as other tools and interactions.
 
 
 \end{itemize}
@@ -274,9 +257,9 @@ The \symbolist graphic user interface (Figure~\ref{fig:screenshot}) is designed 
 Graphic ``\textit{symbol}'' objects are placed in ``\textit{container}'' symbols, which function as a context frame that can be used to interpret the meaning of the symbol.
 
 In order to maintain an open and un-opinionated approach, the \symbolist framework does not specify how containers and symbols should look, act, or respond when you interact with them. 
-Rather, the interaction and meanings of the symbols are defined in a library of custom object ``\textit{definitions}'' which specify meaning through mapping semantic data to-and-from its graphic representation. 
+Rather, the interaction and meanings of the symbols are defined in a library of custom object ``\textit{definitions},'' which specify meaning through mapping semantic data to-and-from its graphic representation. 
 
-Symbol definitions provide a mechanism to design custom tailored composition environments for particular authoring situations, stored as Javascript libraries, which can be shared between users, and used as templates.
+Symbol definitions provide a mechanism to design custom-tailored composition environments for particular authoring situations, stored as Javascript libraries, which can be shared between users, and used as templates.
 Leveraging web-browser technologies like JS, HTML, CSS, SVG, etc., there are many ways to customize the layout in \symbolist, and potentially, the definition libraries could completely transform the editor layout to serve a particular use-case scenario.
 
 \subsection*{Interface Components}\label{sec:interface_components}
@@ -286,7 +269,7 @@ The main graphic components of the default \symbolist graphic editor are:
 
 \begin{itemize}\itemsep0pt 
 \item 
-\textit{Score view}: the top level view of the application window, containing the main view, and side bar. Sliders are provided to offset the view of the document, as well as basic zoom functionality.
+\textit{Score view}: the top-level view of the application window, containing the main view and side bar. Sliders are provided to offset the view of the document, as well as basic zoom functionality.
 \item 
 \textit{Palette}: a set of buttons in a side toolbar displaying icons of symbols that have been defined for the current selected container context. 
 \item 
@@ -313,14 +296,14 @@ The main graphic components of the default \symbolist graphic editor are:
 
 On entering the application, the editor loads a score or configuration file from the default load folder, which sets the top-level page setup and palette options. A typical sequence of creating a score might be as follows:
 \begin{enumerate}\itemsep0pt
-\item The user opens a workspace, with one or more default container symbols displayed on the screen, for example an empty rectangle which is like a piece of paper.
+\item The user opens a workspace with one or more default container symbols displayed on the screen, for example an empty rectangle, which is like a piece of paper.
 \item Clicking on the ``paper'' container rectangle \textit{selects} it, and then the user sets it as the new \textit{context} by pressing the [s] key.
 \item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
-\item Clicking on one of the palette toolbar symbol icons, puts the interface into ``\textit{palette mode}'', where the mouse interaction is now designed for use with this specific symbol type.
-\item Holding the Command(Mac)/Control(Win) key enters ``\textit{creation mode}'', which by convention draws a temporary preview of the symbol how it will appear when you click, and displays the corresponding semantic representation data as textual feedback.
-\item After clicking the symbol is placed in the container.
+\item Clicking on one of the palette toolbar symbol icons puts the interface into ``\textit{palette mode},'' where the mouse interaction is now designed for use with this specific symbol type.
+\item Holding the Command(Mac)/Control(Win) key enters ``\textit{creation mode},'' which by convention draws a temporary preview of the symbol (how it will appear when you click), and displays the corresponding semantic representation data as textual feedback.
+\item After clicking, the symbol is placed in the container.
 \item Clicking and dragging a symbol graphically modifies its semantic data in reference to the container context. In the case of common practice notation this would be how you would change the time and pitch information of a symbol. The interaction results depend on the ``\textit{selection mode}'' specified in the symbol definition.
-\item User can also modify the semantic parameters as text, by selecting the symbol and hitting the [i] key, which brings up the inspector window, where you can edit the data directly.
+\item User can also modify the semantic parameters as text by selecting the symbol and hitting the [i] key, which brings up the inspector window, where you can edit the data directly.
 \item Pressing the [e] key enters ``\textit{edit mode}'' for the selected symbol, useful for editing of internal attributes that are less relative to the container symbol. For example, you would enter edit mode to adjust bezier curve anchor points.
 \end{enumerate}
 
@@ -330,7 +313,7 @@ At the heart of \symbolist are two parallel forms of information expression: \te
 
 \textit{Semantic} data specifies the various attributes of information about a symbolic object in terms of the object's meaning to the author. 
 For example, the meaningful attributes of a \textit{note} object might be information about pitch and duration, or a \textit{point} object might contain x, y, and z values corresponding to the point's location in 3D space. 
-In \symbolist the semantic representation is thought of as the main holder of information, which through grouping and hierarchical arrangement can be used to represent scores or other types of data structures.
+In \symbolist the semantic representation is thought of as the main holder of information, which can be grouped into hierarchies to represent scores or other types of data structures.
 
 The \textit{graphic} representation is a symbolic visual expression of the semantic data, designed relative to the context defined by the author. 
 
@@ -390,7 +373,7 @@ Note that in \symbolist mapping between \textit{performance media} and \textit{g
 
 \section{Semantic Representation}\label{sec:semantic}
 
-Within the \symbolist application, semantic data is stored as Javascript objects, and read/written in JSON\footnote{https://www.json.org/json-en.html} format (transcoded to-and-from OSC for inter-application communication).
+Within the \symbolist application semantic data is stored as Javascript objects and read/written in JSON\footnote{https://www.json.org/json-en.html} format (transcoded to-and-from OSC for inter-application communication).
 
 The main attributes used in \symbolist semantic data objects are:
 
@@ -420,12 +403,12 @@ belowskip=-2 \baselineskip,
 \end{lstlisting}
 
 \noindent
-Here we see an object with the \textit{id} ``foo,'' which is of \textit{class} ``legs'', that has an attribute \textit{action} associated with it and a start time.
+Here we see an object with the \textit{id} ``foo,'' which is of \textit{class} ``legs,'' that has an attribute \textit{action} associated with it and a start time.
 
 \subsection*{Containers}
 Symbols may also contain other symbols. 
-Container symbols function to frame their contents, providing reference and context, like a plot graph frame, which provides a perspective and scaling for interpreting the set of data points displayed in the graph.
-Similarly, when a semantic data object contains other objects, the children are stored as an array in the object's \textit{contents} field. For example an imaginary class ``timeline'', which holds two types of leg actions, we might write something like:
+Container symbols function to frame their contents, providing reference and context like a plot graph frame, which provides a perspective and scaling for interpreting the set of data points displayed in the graph.
+Similarly, when a semantic data object contains other objects, the children are stored as an array in the object's \textit{contents} field. For example, for an imaginary class ``timeline,'' which holds two types of leg actions, we might write:
 
 \begin{lstlisting}[
 belowskip=-2 \baselineskip,
@@ -464,7 +447,7 @@ belowskip=-2 \baselineskip,
 
 Since the data elements are stored as JS objects, it is easy to import/export \symbolist scores as JSON files.
 
-When the application loads, it reads a default initialization file, in the form of a \symbolist score.
+When the application loads, it reads a default initialization file in the form of a \symbolist score.
 The current default initialization config file looks like this:
 
 \begin{minipage}{\linewidth}
@@ -516,17 +499,17 @@ belowskip=-2 \baselineskip,
 \end{lstlisting}
 \end{minipage}
 
-In this example, we can see there is a ``RootSymbol'', which contains a ``SystemContainer'', which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbols.
+In this example, we can see there is a ``RootSymbol,'' which contains a ``SystemContainer,'' which in turn contains two ``PartStave'' symbols and one ``FiveLineStave'' symbols.
 
 \section{Browser Notation}\label{sec:graphic_display_format}
 
-\symbolist uses SVG to draw graphic symbol representation, utilizing \drawsocket as a convenience wrapper to provide shorthand methods to create and manipulating browser window elements. 
+\symbolist uses SVG to draw graphic symbol representation, utilizing \drawsocket as a convenience wrapper to provide shorthand methods to create and manipulate browser window elements. 
 
 \subsection*{SVG / HTML Format}
 
 The \symbolist format for a \textit{symbol} in its browser-rendered notation, is a set of three group elements ($<$g$>$ in SVG, or $<$div$>$ in HTML) marked by \textit{class} tags, which follow the defined symbol class name.
 
-For a symbol class type ``SymbolClassName'', the SVG template would be:
+For a symbol class type ``SymbolClassName,'' the SVG template would be:
 
 \begin{lstlisting}[
 belowskip=-2 \baselineskip,
@@ -538,7 +521,7 @@ mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfa
 </g>
 \end{lstlisting}
 
-The ``\textit{symbol}'' class marks the top-level symbol group containing the ``\textit{display}'' and ``\textit{contents}'' groups. The ``\textit{display}'' group holds all of the symbol's display information, and the ``\textit{contents}'' group for any potential child elements. 
+The ``\textit{symbol}'' class marks the top-level symbol group containing the ``\textit{display}'' and ``\textit{contents}'' groups. The ``\textit{display}'' group holds all of the symbol's display information and the ``\textit{contents}'' group contains any potential child elements. 
 For simplicity all graphic \textit{symbol} elements include both the \textit{display} and \textit{contents} elements as placeholders.
 
 %Symbols and containers can also be HTML elements instead of SVG. In the case of HTML you would use $<$div$>$ instead of $<$g$>$ tags for the symbol elements.
@@ -608,10 +591,10 @@ mathescape, columns=fullflexible, breaklines=true,basicstyle=\oscfontsize\fontfa
 \section{Symbol Definitions}\label{library_definitions_api}
 %Definition scripts are composed as Javascript modules which are loaded into the program at runtime.
 
-Symbols are defined as Javascript classes which are stored and recalled when symbol actions are performed. 
+Symbols are defined as Javascript classes, which are stored and recalled when symbol actions are performed. 
 For each user interaction, the ui- and io-controllers look up the symbols involved in the interaction by class name, and use their definition to execute the symbol's reaction.
 
-Definitions specify the bidirectional mapping between \textit{semantic} and \textit{graphic} representations, and responses to OSC ``\textit{lookup}'' queries which can be used to perform the score.
+Definitions specify the bidirectional mapping between \textit{semantic} and \textit{graphic} representations and responses to OSC ``\textit{lookup}'' queries which can be used to perform the score.
 
 %Through creating definitions, users are able to form libraries of symbols that can be used together to fit the tools and representation structure needed to address a given use-case scenario.
 
@@ -620,7 +603,7 @@ Definitions specify the bidirectional mapping between \textit{semantic} and \tex
 %\subsection*{UI and IO definitions}
 There are two types of definition scripts:
 \begin{itemize}\itemsep0pt 
-\item \textit{ui-definitions} run in the \uicontroller and perform user interactions based on the different interaction modes and applies bidirectional mapping between semantic and graphic representations.
+\item \textit{ui-definitions} run in the \uicontroller and perform user interactions based on the different interaction modes, and applies bidirectional mapping between semantic and graphic representations.
 \item \textit{io-definitions} run in the \iocontroller and are used to assist in the lookup and OSC \textit{performance} mappings of the semantic data to media like sound synthesis, video, etc., or to perform server-side score manipulations.
 \end{itemize}
 
@@ -786,7 +769,7 @@ The ``data'' keyword message has the following required and optional attributes:
   \item Other required or optional parameters will depend on the symbol definition.
 \end{itemize}
 
-Upon receiving an OSC message with the \textit{key} ``data'', the object payload stored by \textit{val} is added to the model, and then relayed to the \uicontroller.
+Upon receiving an OSC message with the \textit{key} ``data,'' the object payload stored by \textit{val} is added to the model, and then relayed to the \uicontroller.
 
 % this is the second part of the process:
 
@@ -851,7 +834,7 @@ belowskip=-2 \baselineskip,
 }
 \end{lstlisting}
 \noindent
-On receiving this OSC bundle, the \iocontroller will lookup the class ``Staff'' and attempt to call its method ``transpose'', passing the entire \textit{val} object to the symbol method as an argument. The user-defined ``transpose'' function might then do something like lookup the ``oboe'' staff in the model, and then iterate all of its contents, offsetting the ``note'' values by the number of steps specified in the method arguments.
+On receiving this OSC bundle, the \iocontroller will lookup the class ``Staff'' and attempt to call its method ``transpose,'' passing the entire \textit{val} object to the symbol method as an argument. The user-defined ``transpose'' function might then do something like lookup the ``oboe'' staff in the model, and then iterate all of its contents, offsetting the ``note'' values by the number of steps specified in the method arguments.
 
 %%%%%
 % screenshot
@@ -864,24 +847,26 @@ On receiving this OSC bundle, the \iocontroller will lookup the class ``Staff'' 
 
 \section{Conclusions} % and Future Developments
  
-With the new symbol class definition system in place, initial tests seem promising, and support the hope that this new experimental \symbolist implementation will be able to handle a very wide variety of score and symbol structures, by providing  mechanisms for users to compose bidirectional mappings between semantic and graphic representation.
-The system has the potential to address many applications in digital media compositional practice, and may someday evolve into a fully functional authoring environment for computer performable symbolic notation.
+With the new symbol class definition system in place, initial tests seem promising, and support the hope that this new experimental \symbolist implementation will be able to handle a wide variety of score and symbol structures by providing  mechanisms for users to compose bidirectional mappings between semantic and graphic representation.
+The system has the potential to address many applications in digital media compositional practice, and may someday evolve into a fully-functional authoring environment for computer performable symbolic notation.
 
-In order to further evaluate the robustness of the system, the next steps will be to go through the process of developing complete definition libraries for working with different types of notation systems. As a test case, currently one PhD student at the HfMT Hamburg has been working on a set of definitions for common practice notation, which is planned for presentation at the 2023 TENOR conference, along with other experimental approaches.
+In order to further evaluate the robustness of the system, the next steps will be to go through the process of developing complete definition libraries for working with different types of notation systems. As a test case, we have been working on a set of definitions for common practice notation, which is planned for presentation at the 2023 TENOR conference, along with other experimental approaches.
 
-One challenge that may need to be addressed is the ease or difficulty there is in creating new symbol definitions. At the moment the system is based in Javascript, which means that the user must program the definitions with textural code. However, since \symbolist is a graphically oriented authoring environment, it would be convenient if there were some way to create new symbol definitions graphically, within the main editor application.
+One challenge that may need to be addressed is the ease or difficulty of creating new symbol definitions. At the moment the system is based in Javascript, which means that the user must program the definitions with textural code. However, since \symbolist is a graphically oriented authoring environment, it would be convenient if there was a way to create new symbol definitions graphically within the main editor application.
 To address this issue, further research is planned to develop a GUI for symbol definitions, and other tools to help streamline the process of specifying bidirectional mappings. 
-For example, most mathematical operations have an inverse operation, and so perhaps there could be a GUI interface that provides tools to define both mapping directions simultaneously.
+For example, most mathematical operations have an inverse operation, so perhaps there could be a GUI interface that provides tools to define both mapping directions simultaneously.
 
-The Electron framework is currently working well for cross platform app development, however there have been some issues that came up after Electron version 12 which introduced new security measures, including context isolation,\footnote{https://www.electronjs.org/docs/latest/tutorial/context-isolation} and increased limitations of the using the \textit{require} function to import user libraries. In order to function in a web-safe way, \symbolist is currently using Webpack\footnote{https://webpack.js.org/} to bundle the JS classes into a single file that is loaded on startup. 
-Previously, users were able to dynamically load symbol definitions at run time, which seems like a more natural user experience.
-However, since \symbolist is now browser-based and using the same system as \drawsocket for dynamic graphic rendering, there is also the possibility of networked use of \symbolist, for example, in connection with a graphic multitouch interface (iPad etc.), it would be possible to interact with \symbolist over a network, and therefore possibly the web-security measures are important. 
-More testing is needed to determine which features are the most important, balancing usability with web-security.
+The Electron framework is currently working well for cross-platform app development, however some issues came up after the Electron version 12 update, which introduced new security measures including context isolation,\footnote{https://www.electronjs.org/docs/latest/tutorial/context-isolation} and increased limitation in using the \textit{require} function used in \symbolist to import user libraries. 
+In order to comply with  new Electron web safety measures, \symbolist now uses Webpack\footnote{https://webpack.js.org/} to bundle the symbol definitions into a static library file, which is loaded on startup—previously users were able to dynamically load symbol definitions at run time, which seems like a more natural user experience. 
+The new security measures are less than ideal for dynamic updating, however, on the positive side, since \symbolist is now browser-based and uses the same system as \drawsocket for dynamic graphic rendering, \symbolist could now be easily used in networked situations.
+For example for synchronized score display, or use with multitouch tablets (iPad etc.).
+In cases where \symbolist is exposed to the internet, the new web-security measures may be important. 
+More testing is needed to determine which features are the most critical, balancing usability with web-security.
 
 For playback/sequencing of \symbolist scores,  users can currently send either \textit{lookup} or \textit{lookupFormatted} messages to the \iocontroller, which will then respond with data that can be used to perform the score in another software like Max, Pd, SuperCollider, etc.
 The lookup system is currently implemented in Javascript, which is not the fastest or most temporally precise method of playing back the score.
-As a starting point, we are testing using a new Max external called \textit{o.lookup$\sim$}, which accepts a list of x and y coordinate points and reads through the sequence of points via a sample-rate phase input.
-This system works quite will for single data sequences (i.e. value of $y$ at point $x$), however for more robust playback, it might be worthwhile to develop a more complete database lookup system in C/C++, which could provide optimized getter methods for data playback. 
+As a starting point we are testing a new Max external called \textit{o.lookup$\sim$}, which accepts a list of x and y coordinate points and reads through the sequence of points via a sample-rate phase input.
+This system works quite well for single data sequences (i.e. value of $y$ at point $x$), however for more robust playback, it might be worthwhile to develop a more complete database lookup system in C/C++, which could provide optimized getter methods for data playback. 
 For example, this might take the form of a Max external that can read a \symbolist score and provide optimized access for playback, and instrument track selection.
 It could also be imagined that a score could be exported to playback in a DAW like Ableton Live, and to form connections to other OSC sequencing applications like IRCAM's Antescofo expression language\cite{giavitto2017time}.
 
@@ -889,21 +874,19 @@ Other development directions that may be interesting to pursue would be to integ
 Some first steps for 3D graphics have begun with the introduction of the three.js\footnote{https://threejs.org/} library, visible in the rotated cubes in Figure~\ref{fig:screenshot}, however more work is needed to provide tools for manipulating 3D graphics.
 In the area of notation for spatial movement, there are plans to continue development of trajectories (visible in the curves attached to note events in Figure \ref{fig:screenshot}), and to connect \symbolist with the ICST's Spatialization Symbolic Music Notation (SSMN)\cite{ellberger2014spatialization}.
 
-In the audio domain, it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Max/Gen$\sim$ DSP code.%, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
+In the audio domain it could be interesting to develop tools for development of signal processing graphs that could be interpreted and performed in other applications, for example generating Faust\footnote{https://faust.grame.fr/} or Max/Gen$\sim$ DSP code.%, SuperCollider instruments etc. %, or even potentially creating connections with other web-based visual programming interfaces like purr-data\footnote{https://git.purrdata.net/jwilkes/purr-data} and cables.gl\footnote{https://cables.gl/}.
 
-There are very many possibilities for the future development of \symbolist, and so far it seems that the framework is providing a solid ground for the creation of new authoring environments. In a way, \symbolist is a meta-environment, an application that aims to ease the process of creating new authoring environments.
-Like the creation of a new instrument, the challenge then is to work through the difficulties of creating the instrument, so that the instrument can be learned to play, and then, finally, the instrument can be used for the creation of new kinds of art.
+There are many possibilities for the future development of \symbolist, and so far it seems that the framework is providing a solid ground for the creation of new authoring environments. In a way, \symbolist is a meta-environment, an application that aims to ease the process of creating new authoring environments.
+Like the creation of a new instrument, the challenge then is to work through the difficulties of creating the instrument, so that it can be learned and used for the creation of new kinds of art.
 
-\begin{acknowledgments}
-
-A special thanks to James Tsz-Him Cheung for his work on the common practice notation definitions, which is greatly helping push \symbolist forward, and especially thank you to Prof. Dr. Georg Hajdu for his collaboration and ongoing support for this work.
-
-\end{acknowledgments} 
+%\begin{acknowledgments}
+%A special thanks to James Tsz-Him Cheung for his work on the common practice notation definitions, which is greatly helping to push \symbolist forward, and especially thank you to Prof. Dr. Georg Hajdu for his collaboration and ongoing support of this work.
+%\end{acknowledgments} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %bibliography 
 \balance % balance the columns on the last page
-\bibliography{symbolist}
+\bibliography{symbolist-anonymized}
 \end{document}
 
 
