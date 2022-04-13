@@ -30,10 +30,7 @@
 
 
 \def\papertitle{Symbolist Re-imagined: bidirectional graphic-semantic mapping for media notation authoring and performance}
-\def\firstauthor{Anonymized} %Rama Gottfried
-%\def\secondauthor{James Tsz-Him Cheung}
-%\def\thirdauthor{Georg Hajdu}
-
+\def\firstauthor{Rama Gottfried} 
 \def\copyrightyear{2022}
 
 
@@ -52,7 +49,7 @@
 
 
 %% Depending on the number of authors, set this variable accordingly for the copyright notice:
-%\def\copyrightauthors{Rama Gottfried}
+\def\copyrightauthor{Rama Gottfried}
 
 \def\oscfontsize{\tiny}
 
@@ -115,9 +112,8 @@
 \title{\papertitle}
 
 \oneauthor
-   {\firstauthor} { }
-%   {\firstauthor} { Hochschule für Musik und Theater \\ Hamburg, Germany \\
-%     {\tt \href{mailto:rama.gottfried@hfmt-hamburg.de}{rama.gottfried@hfmt-hamburg.de}}}
+   {\firstauthor} { Hochschule für Musik und Theater \\ Hamburg, Germany \\
+     {\tt \href{mailto:rama.gottfried@hfmt-hamburg.de}{rama.gottfried@hfmt-hamburg.de}}}
 
 
 
@@ -202,7 +198,7 @@ Based in node.js and standard web technologies of HTML, SVG, CSS, and Javascript
 
 Returning to \symbolist after the first \drawsocket concerts, I began wondering if the framework of \symbolist needed to be redesigned from the perspective of bidirectional mapping, since I realized that this was most likely going to be the most important part of the graphic-data relationship that the system is developing towards. 
 
-SVG is very well supported in modern browsers, and having just worked with node.js and browser technologies for \drawsocket, it seemed that the flexibility of Javascript could be a convenient option for users to create custom symbol definitions (as in Scriptographer). I decided to see how fast it would be to implement a proof of concept using Electron.js,\footnote{https://www.electronjs.org/} a cross-platform desktop application development using a node.js sever and Chrome as a front-end, used for applications like Skype, WhatsApp, Visual Studio Code, Slack, WordPress, and others.
+SVG is very well supported in modern browsers, and having just worked with node.js and browser technologies for \drawsocket, it seemed that the flexibility of Javascript could be a convenient option for users to create custom symbol definitions (as in Scriptographer). I decided to see how fast it would be to implement a proof of concept using Electron.js,\footnote{https://www.electronjs.org/} a cross-platform desktop application development using a node.js server and Chrome as a front-end, used for applications like Skype, WhatsApp, Visual Studio Code, Slack, WordPress, and others.
 %While developing \drawsocket, I did some study into frameworks such like React\footnote{https://reactjs.org/} which provide object oriented ways of handling graphic interfaces, not unlike the approaches used in JUCE, however after working in JUCE, I wanted something lightweight and simple to start with.
 
 Using \drawsocket as a frontend, and node.js for the backend I found that I was able to get up and running very quickly with Electron, and decided to continue \symbolist development in this direction, bringing the experience gained from the JUCE version to the creation of a deeper structure for the creation of symbol interpretations that integrate into the graphic manipulation of symbolic data. 
@@ -245,7 +241,7 @@ Within the main server, a child process called the ``\iocontroller''  handles in
 
 \end{itemize}
 
-Since the system is now based on a web-server model, we are able to also use Max's \textit{node.script} object to run the sever from within Max as an alternative to the Electron desktop app.
+Since the system is now based on a web-server model, we are able to also use Max's \textit{node.script} object to run the server from within Max as an alternative to the Electron desktop app.
 %The \iocontroller holds a copy of the score in its semantic data format (described below), and loads a library of user scripts shared with the \uicontroller which define the mapping to (and potentially from) other media sources. 
 %
 %The \iocontroller can also be used to translate the score into other formats that can be performed by another sequencing tool or program like MaxMSP.
@@ -273,9 +269,9 @@ The main graphic components of the default \symbolist graphic editor are:
 \item 
 \textit{Palette}: a set of buttons in a side toolbar displaying icons of symbols that have been defined for the current selected container context. 
 \item 
-\textit{Tools}: a set of buttons that open high-level tools, that can be used for operations like algorithmic generation of new symbols, or applying transformations to existing elements (e.g. alignment of multiple objects, or setting distributing objects, etc.)
+\textit{Tools}: a set of buttons that open high-level tools, that can be used for operations like algorithmic generation of new symbols, or applying transformations to existing elements (e.g. alignment of multiple objects, setting distributing objects, or other operations).
 \item 
-\textit{Inspector}: a contextual menu for editing the semantic data of a selected symbol, which on update is mapped to the graphic representation and sent to the sever to update the main score database.
+\textit{Inspector}: a contextual menu for editing the semantic data of a selected symbol, which on update is mapped to the graphic representation and sent to the server to update the main score database.
 %\item 
 %\textit{Menu bar}: the menu bar at the top of the screen or window, which provides access to various application functions.
 \end{itemize}
@@ -298,7 +294,7 @@ On entering the application, the editor loads a score or configuration file from
 \begin{enumerate}\itemsep0pt
 \item The user opens a workspace with one or more default container symbols displayed on the screen, for example an empty rectangle, which is like a piece of paper.
 \item Clicking on the ``paper'' container rectangle \textit{selects} it, and then the user sets it as the new \textit{context} by pressing the [s] key.
-\item Once setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
+\item After setting the context, the palette toolbar is populated with icons of symbols that are defined with the selected container context type.
 \item Clicking on one of the palette toolbar symbol icons puts the interface into ``\textit{palette mode},'' where the mouse interaction is now designed for use with this specific symbol type.
 \item Holding the Command(Mac)/Control(Win) key enters ``\textit{creation mode},'' which by convention draws a temporary preview of the symbol (how it will appear when you click), and displays the corresponding semantic representation data as textual feedback.
 \item After clicking, the symbol is placed in the container.
@@ -322,7 +318,7 @@ The aim of \symbolist is to provide an agnostic environment for developing, and 
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=1\columnwidth]{graphic-representation.pdf}
-\caption{\textit{Semantic} vs \textit{graphic} representation of the same information. Note: Figures \ref{fig:graphic-representation}-\ref{fig:score-lookup} use pseudocode for sake of brevity (see Sections \ref{sec:semantic} and \ref{sec:graphic_display_format} for  syntax details).
+\caption{\textit{Semantic} vs \textit{graphic} representation of the same information. Note: Figures \ref{fig:graphic-representation}-\ref{fig:score-lookup} use pseudocode for brevity (see Sections \ref{sec:semantic} and \ref{sec:graphic_display_format} for  syntax details).
 \label{fig:graphic-representation}}
 \end{figure}
 
@@ -712,7 +708,7 @@ Current default io-definition variables and methods used by the \iocontroller ar
 \begin{itemize}\itemsep0pt 
 \item \textit{class}: the unique name of the symbol, used to store and lookup the symbol definition.
 
-\item \textit{comparator}: a comparator function used in container symbols to sort child symbol. For example, if a given container uses a \textit{time} value for sorting, when a new child node is added, the comparator function helps the container insert the child element at the correct location in the \textit{contents} array.\footnote{Pre-sorting increases the efficiency for later lookup queries.}
+\item \textit{comparator}: a comparator function used in container symbols to sort child symbols. For example, if a given container uses a \textit{time} value for sorting, when a new child node is added, the comparator function helps the container insert the child element at the correct location in the \textit{contents} array.\footnote{Pre-sorting increases the efficiency for later lookup queries.}
 
 \item \textit{lookup}: called via OSC to look up events at a given value specified by the container (e.g. typically time); returns the query results to the caller via OSC. 
 By default the output is an array of all active data objects at the lookup point, along with the relative phase position within each element, useful for controlling amplitude envelopes etc.  Figure~\ref{fig:score-lookup}).
@@ -723,7 +719,7 @@ By default the output is an array of all active data objects at the lookup point
 
 \end{itemize}
 
-Note that the \textit{lookup} and \textit{getFormattedLookup} methods receive the complete OSC bundle that is sent in, and also have access to the entire score database, and so it is also possible to define multiple ways of looking up (and performing) the score data at the same time; for example multidimensional nearest neighbor lookup, or polytemporal sequencing, etc.
+Note that the \textit{lookup} and \textit{getFormattedLookup} methods receive the complete OSC bundle that is sent in, and also have access to the entire score database, and so it is also possible to define multiple ways of looking up (and performing) the score data at the same time; for example multidimensional nearest neighbor lookup, or polytemporal sequencing.
 
 %all parameters included in the input \drawsocket syntax \textit{val} object will be included in the data received by \textit{lookup} and \textit{getFormattedLookup} as a parameters, and can then be used when performing the lookup, for example to perform multidimensional nearest neighbor lookup, etc.
 
@@ -886,7 +882,7 @@ Like the creation of a new instrument, the challenge then is to work through the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %bibliography 
 \balance % balance the columns on the last page
-\bibliography{symbolist-anonymized}
+\bibliography{symbolist}
 \end{document}
 
 
